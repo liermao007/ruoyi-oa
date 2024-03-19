@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.HospitalDetailIndexMonthsDao">
+    
+	<sql id="hospitalDetailIndexMonthsColumns">
+		a.id AS "id",
+		a.org_id AS "orgId",
+		a.master_id AS "masterId",
+		a.month AS "month",
+		a.group_cash_budgetary_amount_months AS "groupCashBudgetaryAmountMonths",
+		a.group_cash_actual_amount_months AS "groupCashActualAmountMonths",
+		a.medical_income_budgetary_amount_months AS "medicalIncomeBudgetaryAmountMonths",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.medical_income_actual_amount_months AS "medicalIncomeActualAmountMonths",
+		a.update_by AS "updateBy.id",
+		a.cost_expenditure_budgetary_amount_months AS "costExpenditureBudgetaryAmountMonths",
+		a.update_date AS "updateDate",
+		a.cost_expenditure_actual_amount_months AS "costExpenditureActualAmountMonths",
+		a.profit_budgetary_amount_months AS "profitBudgetaryAmountMonths",
+		a.del_flag AS "delFlag",
+		a.profit_actual_amount_months AS "profitActualAmountMonths",
+		a.operation_index_budgetary_amount_months AS "operationIndexBudgetaryAmountMonths",
+		a.operation_index_actual_amount_months AS "operationIndexActualAmountMonths",
+		a.purchasing_rate_budgetary_amount_months AS "purchasingRateBudgetaryAmountMonths",
+		a.purchasing_rate_actual_amount_months AS "purchasingRateActualAmountMonths",
+		a.quality_standard_budgetary_amount_months AS "qualityStandardBudgetaryAmountMonths",
+		a.quality_standard_actual_amount_months AS "qualityStandardActualAmountMonths"
+	</sql>
+	
+	<sql id="hospitalDetailIndexMonthsJoins">
+	</sql>
+    
+	<select id="get" resultType="HospitalDetailIndexMonths">
+		SELECT 
+			<include refid="hospitalDetailIndexMonthsColumns"/>
+		FROM hospital_detail_index_months a
+		<include refid="hospitalDetailIndexMonthsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="HospitalDetailIndexMonths">
+		SELECT 
+			<include refid="hospitalDetailIndexMonthsColumns"/>
+		FROM hospital_detail_index_months a
+		<include refid="hospitalDetailIndexMonthsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="HospitalDetailIndexMonths">
+		SELECT 
+			<include refid="hospitalDetailIndexMonthsColumns"/>
+		FROM hospital_detail_index_months a
+		<include refid="hospitalDetailIndexMonthsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hospital_detail_index_months(
+			id,
+			org_id,
+			master_id,
+			month,
+			group_cash_budgetary_amount_months,
+			group_cash_actual_amount_months,
+			medical_income_budgetary_amount_months,
+			create_by,
+			create_date,
+			medical_income_actual_amount_months,
+			update_by,
+			cost_expenditure_budgetary_amount_months,
+			update_date,
+			cost_expenditure_actual_amount_months,
+			profit_budgetary_amount_months,
+			del_flag,
+			profit_actual_amount_months,
+			operation_index_budgetary_amount_months,
+			operation_index_actual_amount_months,
+			purchasing_rate_budgetary_amount_months,
+			purchasing_rate_actual_amount_months,
+			quality_standard_budgetary_amount_months,
+			quality_standard_actual_amount_months
+		) VALUES (
+			#{id},
+			#{orgId},
+			#{masterId},
+			#{month},
+			#{groupCashBudgetaryAmountMonths},
+			#{groupCashActualAmountMonths},
+			#{medicalIncomeBudgetaryAmountMonths},
+			#{createBy.id},
+			#{createDate},
+			#{medicalIncomeActualAmountMonths},
+			#{updateBy.id},
+			#{costExpenditureBudgetaryAmountMonths},
+			#{updateDate},
+			#{costExpenditureActualAmountMonths},
+			#{profitBudgetaryAmountMonths},
+			#{delFlag},
+			#{profitActualAmountMonths},
+			#{operationIndexBudgetaryAmountMonths},
+			#{operationIndexActualAmountMonths},
+			#{purchasingRateBudgetaryAmountMonths},
+			#{purchasingRateActualAmountMonths},
+			#{qualityStandardBudgetaryAmountMonths},
+			#{qualityStandardActualAmountMonths}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hospital_detail_index_months SET 	
+			org_id = #{orgId},
+			master_id = #{masterId},
+			month = #{month},
+			group_cash_budgetary_amount_months = #{groupCashBudgetaryAmountMonths},
+			group_cash_actual_amount_months = #{groupCashActualAmountMonths},
+			medical_income_budgetary_amount_months = #{medicalIncomeBudgetaryAmountMonths},
+			medical_income_actual_amount_months = #{medicalIncomeActualAmountMonths},
+			update_by = #{updateBy.id},
+			cost_expenditure_budgetary_amount_months = #{costExpenditureBudgetaryAmountMonths},
+			update_date = #{updateDate},
+			cost_expenditure_actual_amount_months = #{costExpenditureActualAmountMonths},
+			profit_budgetary_amount_months = #{profitBudgetaryAmountMonths},
+			profit_actual_amount_months = #{profitActualAmountMonths},
+			operation_index_budgetary_amount_months = #{operationIndexBudgetaryAmountMonths},
+			operation_index_actual_amount_months = #{operationIndexActualAmountMonths},
+			purchasing_rate_budgetary_amount_months = #{purchasingRateBudgetaryAmountMonths},
+			purchasing_rate_actual_amount_months = #{purchasingRateActualAmountMonths},
+			quality_standard_budgetary_amount_months = #{qualityStandardBudgetaryAmountMonths},
+			quality_standard_actual_amount_months = #{qualityStandardActualAmountMonths}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE hospital_detail_index_months SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.TableSetDao">
+    
+	<sql id="TableSetColumns">
+		a.id AS "id",
+		a.table_id AS "tableId",
+		a.tableName AS "tableName",
+		a.company_id AS "companyId",
+		a.table_comment AS "tableComment"
+		a.is_send AS "isSend"
+	</sql>
+	<sql id="TableSetJoins">
+	</sql>
+
+	<select id="getCid" resultType="java.lang.String">
+		SELECT 
+			b.company_id
+		FROM sms_set a,table_set b
+		WHERE a.company_id = b.company_id
+	</select>
+
+	<insert id="insert">
+		INSERT INTO table_set(
+			id,
+			company_id,
+		    is_send,
+            table_id,
+            tableName,
+            table_comment
+		) VALUES (
+			#{id},
+			#{companyId},
+			#{isSend},
+			#{tableId},
+			#{tableName},
+			#{tableComment}
+		)
+	</insert>
+	
+	<update id="update" >
+		UPDATE table_set a SET
+		    a.is_send = #{isSend},
+		WHERE
+		a.company_id = #{companyId}
+		and a.table_id = #{tableId}
+	</update>
+	
+	<delete id="del">
+		delete from  table_set
+		WHERE company_id = #{id}
+	</delete>
+
+	<select id="getById" resultType="java.lang.String">
+		SELECT
+		s.*
+		FROM table_set s
+		where s.id = #{id}
+		and s.company_id = #{cid}
+	</select>
+
+	<select id="findAll" resultType="TableSet">
+		 SELECT
+		 a.id, a.office_id companyId, a.table_name, a.table_comment FROM oa_person_define_table a
+         where  a.office_id = #{id}
+         AND a.del_flag = '0'
+	</select>
+
+	<select id="findLack" resultType="TableSet">
+		select
+		a.id, a.company_id companyId, a.tableName, a.table_comment tableComment
+		from table_set a
+		where company_id = #{id}
+	</select>
+
+	<select id="superFindAll" resultType="TableSet">
+		SELECT
+		a.id, a.office_id companyId, a.table_name tableName, a.table_comment tableComment
+		FROM oa_person_define_table a
+		where a.del_flag = '0'
+	</select>
+
+	<select id="findTableIsSend" resultType="java.lang.Integer">
+		SELECT
+		count(a.is_send)
+		FROM table_set a
+		where a.tableName = #{tableName}
+	</select>
+
+</mapper>

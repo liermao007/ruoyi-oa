@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.TransferSetDao">
+    
+	<sql id="transferSetColumns">
+		a.id AS "id",
+		a.handle_person AS "handlePerson",
+		a.node_type AS "nodeType",
+		a.node_name AS "nodeName",
+		a.node_sort AS "nodeSort",
+		a.del_flag AS "delFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.proc_inst_id AS "procInstId",
+		a.handle_person_id AS "handlePersonId",
+		a.flag AS "flag",
+		a.task_def_key AS "taskDefKey",
+		a.handle_person_card AS "handlePersonCard"
+	</sql>
+	
+	<sql id="transferSetJoins">
+	</sql>
+    
+	<select id="get" resultType="TransferSet">
+		SELECT 
+			<include refid="transferSetColumns"/>
+		FROM transfer_set a
+		<include refid="transferSetJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TransferSet">
+		SELECT 
+			<include refid="transferSetColumns"/>
+		FROM transfer_set a
+		<include refid="transferSetJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} and a.flag = '0' and  node_type != '开始'
+            <if test="procInstId != null and procInstId != ''">
+               and a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+                and a.task_def_key = #{taskDefKey}
+            </if>
+            <if test="handlePersonCard != null and handlePersonCard != ''">
+                and a.handle_person_card = #{handlePersonCard}
+            </if>
+		</where>
+         ORDER BY a.node_sort
+	</select>
+
+    <select id="findListByProcInstId" resultType="TransferSet">
+        SELECT
+        <include refid="transferSetColumns"/>
+        FROM transfer_set a
+        <include refid="transferSetJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="procInstId != null and procInstId != ''">
+                and a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+                and a.task_def_key = #{taskDefKey}
+            </if>
+            <if test="handlePersonCard != null and handlePersonCard != ''">
+                and a.handle_person_card = #{handlePersonCard}
+            </if>
+        </where>
+        ORDER BY a.node_sort
+    </select>
+	
+	<select id="findAllList" resultType="TransferSet">
+		SELECT 
+			<include refid="transferSetColumns"/>
+		FROM transfer_set a
+		<include refid="transferSetJoins"/>
+		<where>
+			a.del_flag = '0'
+            <if test="procInstId != null and procInstId != ''">
+                and a.proc_inst_id = #{procInstId}
+            </if>
+		</where>
+        order by a.node_sort
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO transfer_set(
+			id,
+			handle_person,
+			node_type,
+			node_name,
+			node_sort,
+			del_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			proc_inst_id,
+			handle_person_id,
+			flag,
+			task_def_key,
+			handle_person_card
+		) VALUES (
+			#{id},
+			#{handlePerson},
+			#{nodeType},
+			#{nodeName},
+			#{nodeSort},
+			#{delFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{procInstId},
+			#{handlePersonId},
+			#{flag},
+			#{taskDefKey},
+			#{handlePersonCard}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE transfer_set SET 	
+			handle_person = #{handlePerson},
+			node_type = #{nodeType},
+			node_name = #{nodeName},
+			node_sort = #{nodeSort},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			proc_inst_id = #{procInstId},
+			handle_person_id = #{handlePersonId},
+			flag = #{flag},
+			task_def_key = #{taskDefKey},
+			handle_person_card = #{handlePersonCard}
+		WHERE id = #{id}
+	</update>
+
+
+    <update id="updateFlag">
+        UPDATE transfer_set SET
+        flag = #{flag}
+        WHERE id = #{id}
+    </update>
+	
+	<update id="delete">
+		delete from  transfer_set
+		WHERE proc_inst_id = #{procInstId}
+	</update>
+	
+</mapper>

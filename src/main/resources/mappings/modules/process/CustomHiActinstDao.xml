@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.CustomHiActinstDao">
+    
+	<sql id="customHiActinstColumns">
+		a.id AS "id",
+		a.proc_inst_id AS "procInstId",
+		a.task_def_key AS "taskDefKey",
+		a.name AS "name",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.assignee AS "assignee",
+		a.comment AS "comment"
+	</sql>
+	
+	<sql id="customHiActinstJoins">
+	</sql>
+    
+	<select id="get" resultType="CustomHiActinst">
+		SELECT 
+			<include refid="customHiActinstColumns"/>
+		FROM custom_hi_actinst a
+		<include refid="customHiActinstJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CustomHiActinst">
+		SELECT DISTINCT
+			<include refid="customHiActinstColumns"/> ,t.node_sort as "nodeSort"
+		FROM  custom_hi_actinst a  LEFT JOIN transfer_set t ON a.proc_inst_id = t.proc_inst_id  AND  t.node_name = a.`name`
+        <where>
+            <if test="procInstId != null and procInstId != ''">
+               and a.proc_inst_id = #{procInstId}
+            </if>
+		</where>
+        order by a.start_time,t.node_sort
+	</select>
+
+
+    <select id="findListByEndTime" resultType="CustomHiActinst">
+        SELECT
+        <include refid="customHiActinstColumns"/>
+        FROM custom_hi_actinst a
+        <include refid="customHiActinstJoins"/>
+        <where> a.proc_inst_id = #{procInstId} and ( a.`end_time` IS NULL)
+            <if test="taskDefKey != null and taskDefKey != ''">
+              and  a.task_def_key = #{taskDefKey}
+            </if>
+            <if test="assignee != null and assignee != ''">
+              and  a.assignee = #{assignee}
+            </if>
+            order by a.start_time
+        </where>
+    </select>
+
+    <select id="findCustomHiActinst" resultType="CustomHiActinst">
+        SELECT
+        <include refid="customHiActinstColumns"/>
+        FROM custom_hi_actinst a ,transfer_set t
+        <include refid="customHiActinstJoins"/>
+        <where> t.proc_inst_id = a.proc_inst_id
+            <if test="procInstId != null and procInstId != ''">
+               and a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="assignee != null and assignee != ''">
+              and   a.assignee = #{assignee}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+               and  a.task_def_key = #{taskDefKey}
+            </if>
+        </where>
+        ORDER BY t.`node_sort` ,a.`start_time` DESC
+    </select>
+	
+	<select id="findAllList" resultType="CustomHiActinst">
+		SELECT 
+			<include refid="customHiActinstColumns"/>
+		FROM custom_hi_actinst a
+		<include refid="customHiActinstJoins"/>
+		<where> 1=1
+			 <if test="name != null and name !=''">
+               and  a.name = #{name}
+             </if>
+            <if test="procInstId != null and procInstId !=''">
+                and a.proc_inst_id = #{procInstId}
+            </if>
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO custom_hi_actinst(
+			id,
+			proc_inst_id,
+			task_def_key,
+			name,
+			start_time,
+			end_time,
+			assignee,
+			comment
+		) VALUES (
+			#{id},
+			#{procInstId},
+			#{taskDefKey},
+			#{name},
+			#{startTime},
+			#{endTime},
+			#{assignee},
+			#{comment}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE custom_hi_actinst SET 	
+			proc_inst_id = #{procInstId},
+			task_def_key = #{taskDefKey},
+			name = #{name},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			assignee = #{assignee},
+			comment = #{comment}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM custom_hi_actinst
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.ActRoleDao">
+    
+	<sql id="actRoleColumns">
+		a.role_id AS "roleId",
+		a.act_id AS "actId"
+	</sql>
+	
+	<sql id="actRoleJoins">
+	</sql>
+    
+	<select id="get" resultType="ActRole">
+		SELECT 
+			<include refid="actRoleColumns"/>
+		FROM act_role a
+		<include refid="actRoleJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+    <select id="findByRoleId" resultType="ActRole">
+        SELECT
+        <include refid="actRoleColumns"/>
+        FROM act_role a
+        <include refid="actRoleJoins"/>
+        WHERE a.role_id = #{roleId} and a.act_id=#{actId}
+    </select>
+	
+	<select id="findList" resultType="ActRole">
+		SELECT 
+			<include refid="actRoleColumns"/>
+		FROM act_role a
+		<include refid="actRoleJoins"/>
+		<where>
+            a.role_id = #{roleId}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ActRole">
+		SELECT 
+			<include refid="actRoleColumns"/>
+		FROM act_role a
+		<include refid="actRoleJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO act_role(
+			role_id,
+			act_id
+		) VALUES (
+			#{roleId},
+			#{actId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE act_role SET 	
+			role_id = #{roleId},
+			act_id = #{actId}
+		WHERE role_id = #{roleId} and 	act_id = #{actId}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM act_role
+		WHERE role_id = #{roleId}
+	</update>
+	
+</mapper>

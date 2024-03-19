@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oaStatistics.dao.OaStatisticsFieldDao">
+    <sql id="OaStatisticsNameColumns">
+        id AS id,
+        TJID AS statisticsId,
+        TJBID AS statisticsTableId,
+        ZDMC AS fieldName,
+        control_type_id AS controlTypeId,
+        column_type AS columnType,
+        HJ AS figureOut,
+        XH AS serial,
+        data_type AS dataType,
+        flag AS flag,
+        create_date AS createDate,
+        create_by AS createBy,
+        update_by AS updateBy,
+        update_date AS updateDate,
+        remarks AS remarks,
+        del_flag AS delFlag
+    </sql>
+
+
+    <insert id="addList" parameterType="java.util.List">
+        INSERT INTO 
+        oa_statistics_field(
+        id,
+        TJID,
+        TJBID,
+        ZDMC,
+        control_type_id,
+        column_type,
+        HJ,
+        XH,
+        data_type,
+        flag,
+        create_date,
+        create_by,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )
+        VALUES
+        <foreach collection ="list" item="oaStatisticsField" index= "index" separator =",">
+            (#{oaStatisticsField.id},#{oaStatisticsField.statisticsId},
+            #{oaStatisticsField.statisticsTableId},#{oaStatisticsField.fieldName},
+            #{oaStatisticsField.controlTypeId},#{oaStatisticsField.columnType},#{oaStatisticsField.figureOut},#{oaStatisticsField.serial},#{oaStatisticsField.dataType},
+            #{oaStatisticsField.flag},#{oaStatisticsField.createDate}
+            ,#{oaStatisticsField.createBy.id},#{oaStatisticsField.updateBy.id}
+            ,#{oaStatisticsField.updateDate},#{oaStatisticsField.remarks}
+            ,#{oaStatisticsField.delFlag}
+            )
+        </foreach>
+    </insert>
+
+
+    <select id="getOaStatisticsTableId" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsField">
+        SELECT
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM oa_statistics_field
+        WHERE
+        TJBID = #{oaStatisticsTableId}
+        ORDER BY XH ASC
+    </select>
+
+    <update id="updateEliminate">
+        UPDATE oa_statistics_field
+        SET
+        flag='1',
+        XH=NULL
+        WHERE
+        TJBID=#{tableId}
+    </update>
+
+    <update id="updateAddField">
+        UPDATE oa_statistics_field
+        SET
+        flag= #{flag},
+        XH= #{serial}
+        WHERE
+        TJBID=#{statisticsTableId}
+        AND
+        ZDMC = #{fieldName}
+    </update>
+
+    <update id="update">
+        UPDATE oa_statistics_field
+        SET
+        id = #{id}
+        <if test="statisticsId != null and statisticsId != ''">
+            ,TJID = #{statisticsId}
+        </if>
+        <if test="statisticsTableId != null and statisticsTableId != ''">
+            ,TJBID = #{statisticsTableId}
+        </if>
+        <if test="fieldName != null and fieldName != ''">
+            ,ZDMC = #{fieldName}
+        </if>
+        <if test="figureOut != null and figureOut != ''">
+            ,HJ = #{figureOut}
+        </if>
+        <if test="serial != null and serial != ''">
+            ,XH = #{serial}
+        </if>
+        <if test="dataType != null and dataType != ''">
+            ,data_type=#{dataType}
+        </if>
+        <if test="flag != null and flag != ''">
+            ,flag = #{flag}
+        </if>
+        <if test="createDate != null and createDate != ''">
+            ,create_date = #{createDate}
+        </if>
+        <if test="createBy != null and createBy != ''">
+            ,create_by = #{createBy}
+        </if>
+        <if test="updateBy != null and updateBy != ''">
+            ,update_by = #{updateBy}
+        </if>
+        <if test="updateDate != null and updateDate != ''">
+            ,update_date = #{updateDate}
+        </if>
+        <if test="remarks != null and remarks != ''">
+            ,remarks = #{remarks}
+        </if>
+        <if test="delFlag != null and delFlag != ''">
+            ,del_flag = #{delFlag}
+        </if>
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM oa_statistics_field
+        WHERE
+        <if test="statisticsId != null and statisticsId != '' ">
+          TJID = #{statisticsId}
+        </if>
+        <if test="statisticsTableId != null and statisticsTableId != '' ">
+            TJBID = #{statisticsTableId}
+        </if>
+    </delete>
+
+    <select id="getFiled" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsField">
+        SELECT
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM oa_statistics_field
+        WHERE TJBID = #{TJBID}
+        AND flag='0' ORDER BY XH ASC
+    </select>
+    <!--获取显示数据-->
+    <select id="getFiledName" resultType="java.lang.String">
+        SELECT ZDMC FROM oa_statistics_field
+        WHERE TJBID = #{TJBID}
+         AND flag='0' ORDER BY XH ASC
+    </select>
+
+    <select id="gettingData" resultType="java.util.Map">
+        SELECT id,
+        proc_def_id procDefId,
+        proc_ins_id procInsId,
+        <foreach collection="fieldList" index="index" item="fieldName"  separator="," >
+            <if test="fieldName != conditionSumField">
+                ${fieldName} AS ${fieldName}
+            </if>
+        </foreach>
+        <if test="conditionSumField != null and conditionSumField != ''">
+            ,sum(${conditionSumField}) AS ${conditionSumField}
+        </if>
+        FROM ${tableName}
+        WHERE 1=1
+        <if test="startDate != null and startDate != ''">
+            AND create_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND create_date &lt;= #{endDate}
+        </if>
+        <if test="applicationDate != null and applicationDate != ''">
+            AND create_date = #{applicationDate}
+        </if>
+        <if test="proposer != null and proposer != ''">
+            AND create_by = #{proposer}
+        </if>
+          <if test="existingConditions != null">
+            <foreach collection="existingConditions" index="index" item="existingCondition"  separator=" " >
+                <if test="existingCondition != null and existingConditions != ''">
+                AND ${existingCondition}
+                </if>
+            </foreach>
+          </if>
+        <if test="conditionGroupField != null and conditionGroupField != ''">
+            GROUP BY
+            <foreach collection="conditionGroupField" index="index" item="conditionGroupField"  separator="," >
+                ${conditionGroupField}
+            </foreach>
+        </if>
+    </select>
+    
+    
+    <select id="gettingAllData" resultType="java.util.Map">
+            <foreach collection="list" index="index" item="table"  separator="UNION All" >
+                SELECT id,
+                <foreach collection="table.fieldList" index="index" item="fieldName"  separator="," >
+                    ${fieldName} AS ${fieldName}
+                </foreach>
+                FROM ${table.tableName}
+                WHERE 1=1
+                <if test="table.startDate != null and table.startDate != ''">
+                    AND create_date &gt;= #{table.startDate}
+                </if>
+                <if test="table.endDate != null and table.endDate != ''">
+                    AND create_date &lt;= #{table.endDate}
+                </if>
+                <if test="table.applicationDate != null and table.applicationDate != ''">
+                    AND create_date = #{table.applicationDate}
+                </if>
+                <if test="table.proposer != null and table.proposer != ''">
+                    AND create_by = #{table.proposer}
+                </if>
+            </foreach>
+    </select>
+
+    <select id="details" resultType="java.util.Map">
+        SELECT
+        <foreach collection="fieldList" index="index" item="fieldName"  separator="," >
+            ${fieldName} AS ${fieldName}
+        </foreach>
+        FROM
+        ${tableName}
+        WHERE
+        id=#{dataId}
+    </select>
+
+
+    <select id="date" resultType="java.util.Map">
+        SELECT id,
+        proc_def_id procDefId,
+        proc_ins_id procInsId,
+        <foreach collection="fieldList" index="index" item="fieldName"  separator="," >
+            ${fieldName} AS ${fieldName}
+        </foreach>
+        FROM ${tableName}
+        WHERE 1=1
+        <if test="startDate != null and startDate != ''">
+            AND create_date &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND create_date &lt;= #{endDate}
+        </if>
+        <if test="table.applicationDate != null and table.applicationDate != ''">
+            AND create_date = SUBSTRING (#{table.applicationDate},1,10)
+        </if>
+        <if test="table.proposer != null and table.proposer != ''">
+            AND create_by = #{table.proposer}
+        </if>
+    </select>
+    
+    <!--查询条件配置-->
+    <!--1、获取已选/未选字段-->
+    <select id="fieldType" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsField">
+        SELECT 
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM oa_statistics_field
+        WHERE
+        TJBID = #{statisticsTableId}
+        AND
+        flag = #{flag}
+    </select>
+    
+    <select id="statisticalDetails" resultType="java.util.Map">
+        SELECT
+        id,
+        proc_def_id procDefId,
+        proc_ins_id procInsId,
+        <foreach collection="fieldList" item="fieldName" separator=",">
+            ${fieldName}
+        </foreach>
+        FROM 
+        ${tableName}
+        WHERE 
+        <foreach collection="parameterField" item="parameterField" separator=" AND ">
+            ${parameterField}
+        </foreach>
+    </select>
+</mapper>

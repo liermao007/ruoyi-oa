@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.CustomRuskTaskinstDao">
+    
+	<sql id="customRuskTaskinstColumns">
+		a.id AS "id",
+		a.proc_inst_id AS "procInstId",
+		a.task_def_key AS "taskDefKey",
+		a.assignee AS "assignee",
+		a.name AS "name",
+		a.start_time AS "startTime",
+		a.flag_audit AS "flagAudit"
+	</sql>
+	
+	<sql id="customRuskTaskinstJoins">
+	</sql>
+    
+	<select id="get" resultType="CustomRuskTaskinst">
+		SELECT 
+			<include refid="customRuskTaskinstColumns"/>
+		FROM custom_rusk_taskinst a
+		<include refid="customRuskTaskinstJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CustomRuskTaskinst">
+		SELECT 
+         <include refid="customRuskTaskinstColumns"/>,c.name AS "apply"
+		FROM custom_rusk_taskinst a,custom_process c
+		<include refid="customRuskTaskinstJoins"/>
+		<where> a.proc_inst_id =  c.proc_inst_id
+            <if test="assignee != null and assignee != ''">
+              and  a.assignee = #{assignee}
+            </if>
+            <if test="flagAudit != null and flagAudit != ''">
+                and  a.flag_audit = #{flagAudit}
+            </if>
+            <if test="procInstId != null and procInstId != ''">
+                and  a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+                and  a.task_def_key like
+                <if test="dbName == 'mysql'">concat('%',#{taskDefKey},'%')</if>
+            </if>
+		</where>
+        order by a.start_time desc
+	</select>
+
+
+    <select id="findByProInstId" resultType="CustomRuskTaskinst">
+        SELECT
+        <include refid="customRuskTaskinstColumns"/>
+        FROM custom_rusk_taskinst a
+        <include refid="customRuskTaskinstJoins"/>
+        <where>
+            <if test="procInstId != null and procInstId != ''">
+                a.proc_inst_id  = #{procInstId}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+               and  a.task_def_key  = #{taskDefKey}
+            </if>
+            <if test="flagAudit != null and flagAudit != ''">
+                and  a.flag_audit = #{flagAudit}
+            </if>
+        </where>
+        order by a.start_time desc
+    </select>
+	
+	<select id="findAllList" resultType="CustomRuskTaskinst">
+		SELECT 
+			<include refid="customRuskTaskinstColumns"/>
+		FROM custom_rusk_taskinst a
+		<include refid="customRuskTaskinstJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO custom_rusk_taskinst(
+			id,
+			proc_inst_id,
+			task_def_key,
+			assignee,
+			name,
+			start_time,
+			flag_audit
+		) VALUES (
+			#{id},
+			#{procInstId},
+			#{taskDefKey},
+			#{assignee},
+			#{name},
+			#{startTime},
+			#{flagAudit}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE custom_rusk_taskinst SET 	
+			proc_inst_id = #{procInstId},
+			task_def_key = #{taskDefKey},
+			assignee = #{assignee},
+			name = #{name},
+			start_time = #{startTime},
+			flag_audit = #{flagAudit}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM custom_rusk_taskinst
+		WHERE id = #{id}
+	</update>
+
+    <update id="deleteByProcInstId">
+        DELETE FROM custom_rusk_taskinst
+        WHERE proc_inst_id= #{procInstId}
+    </update>
+
+  <!--  <update id="deleteByProcInstIdAndFlag">
+        DELETE FROM custom_rusk_taskinst
+        WHERE proc_inst_id= #{procInstId}
+        <if test="flagAudit != null and flagAudit !=''">
+            and flag_audit = #{flagAudit}
+        </if>
+    </update>-->
+	
+</mapper>

@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.UserDao">
+    <sql id="userColumns">
+    	a.id,
+    	a.company_id AS "COMPANY.ID",
+    	a.office_id AS "office.id",
+    	a.login_name as "loginName",
+    	a.password,
+    	a.no,
+		a.name,
+		a.sex,
+		a.email,
+		a.phone,
+		a.mobile,
+		a.user_type,
+		a.login_ip,
+		a.login_date,
+		a.remarks,
+		a.login_flag,
+		a.photo AS "photo",
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+		a.grade,
+		a.leader_ship,
+		a.ac_name,
+		a.dept,
+		a.ac_dept_name,
+		a.card_no,
+		a.level2,
+		a.level2_name,
+		a.level1,
+		a.level1_name,
+		a.hrm_flag ,
+		a.work_post,
+		a.leaderNotNull,
+		a.checkAll
+    </sql>
+
+    <sql id="userJoins">
+        LEFT JOIN sys_office c ON c.id = a.company_id
+        LEFT JOIN sys_area ca ON ca.id = c.area_id
+        LEFT JOIN sys_office o ON o.id = a.office_id
+        LEFT JOIN sys_area oa ON oa.id = o.area_id
+        LEFT JOIN sys_user cu ON cu.id = c.primary_person
+        LEFT JOIN sys_user cu2 ON cu2.id = c.deputy_person
+        LEFT JOIN sys_user ou ON ou.id = o.primary_person
+        LEFT JOIN sys_user ou2 ON ou2.id = o.deputy_person<!--
+		LEFT JOIN sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN sys_role r ON r.id = ur.role_id -->
+    </sql>
+
+    <!-- 根据编号获得用户 -->
+    <select id="get" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        <!-- ,
+                    ro.office_id AS "roleList.officeList.id" -->
+        FROM sys_user a
+        <include refid="userJoins"/>
+        <!--
+                LEFT JOIN sys_role_office ro ON ro.role_id = r.id -->
+        WHERE a.id = #{id} and a.del_flag ='0'
+    </select>
+
+    <!--查询所有的人员信息包括离职人员-->
+    <select id="getOne" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        <!-- ,
+                    ro.office_id AS "roleList.officeList.id" -->
+        FROM sys_user a
+        <include refid="userJoins"/>
+        <!--
+                LEFT JOIN sys_role_office ro ON ro.role_id = r.id -->
+        WHERE a.id = #{id}
+    </select>
+
+
+
+    <!--查询所有的离职人员-->
+    <select id="findDelList" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.company_id = #{officeId}
+    </select>
+
+
+
+    <!--查询用户是否是领导-->
+    <select id="findIsParent" resultType="User">
+        SELECT
+        <include refid="userColumns"/>,
+        o.name  AS "officeName"
+        FROM sys_user a
+       left join sys_office o on o.id=a.office_id
+        <!--
+                LEFT JOIN sys_role_office ro ON ro.role_id = r.id -->
+        WHERE a.leader_ship =#{id} and a.company_id = #{companyId}
+        ORDER BY a.office_id
+    </select>
+
+    <!--查询用户是否是领导-->
+    <select id="findIsDept"  resultType ="User">
+        SELECT
+        <include refid="userColumns"/>,
+        o.name  AS "officeName"
+        FROM sys_user a
+        left join sys_office o on o.id=a.office_id
+        <!--
+                LEFT JOIN sys_role_office ro ON ro.role_id = r.id -->
+        WHERE  a.dept  =#{id} and a.company_id = #{companyId}
+        ORDER BY a.office_id
+    </select>
+
+
+    <!--查询用户是否是领导-->
+    <select id="findIsLeader"  resultType ="User">
+        SELECT
+        <include refid="userColumns"/>,
+        o.name  AS "officeName"
+        FROM sys_user a
+        left join sys_office o on o.id=a.office_id
+        <!--
+                LEFT JOIN sys_role_office ro ON ro.role_id = r.id -->
+        WHERE  a.level1  =#{id}  and a.company_id = #{companyId}
+        ORDER BY a.office_id
+    </select>
+
+    <select id="findIsLeaders" resultType="java.lang.Integer" >
+        SELECT
+        count(1)
+        FROM sys_user a
+        WHERE
+         (
+            leader_ship = #{id}
+             AND company_id =#{companyId}
+             )
+           OR (
+             dept = #{id}
+              AND company_id = #{companyId}
+             )
+          OR (
+             level1 =  #{id}
+              AND company_id = #{companyId}
+             )
+    </select>
+
+    <!-- 根据角色名称来查询集团管理员的机构id -->
+    <select id="findListUser" resultType="User" useCache="true">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        where
+        <if test="loginName != null and loginName !=''">
+            a.login_name = #{loginName}
+        </if>
+    </select>
+
+    <!-- 根据登录名查询用户 -->
+    <select id="getByLoginName" resultType="User" parameterType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        and (a.card_no = #{loginName} or a.phone=#{loginName} or a.mobile = #{loginName} or a.email=#{loginName} or
+        a.login_name = #{loginName}) ORDER by a.create_date
+    </select>
+    <!-- 根据人脸库查询的id查询用户 -->
+    <select id="linkFace" resultType="User" parameterType="String">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        left join face_vs_person fvp on a.card_no=fvp.id_card
+        WHERE  fvp.person_uuid = #{personUuid} LIMIT 1
+    </select>
+    <!-- 根据手机号查询用户 -->
+    <select id="getByMobile" resultType="User" parameterType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="mobile !=null and mobile !=''">
+            and a.mobile = #{mobile}
+        </if>
+    </select>
+
+    <!-- 根据邮箱查询用户 -->
+    <select id="getByEmail" resultType="User" parameterType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="email !=null and email !=''">
+            and a.email = #{email}
+        </if>
+    </select>
+
+    <!-- 根据身份证号查询用户 -->
+    <select id="getByCardNo" resultType="User" parameterType="User">
+        SELECT
+        b.name as companyId
+        FROM sys_user a,sys_office b
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL} and b.id = a.company_id
+        <if test="cardNo !=null and cardNo !=''">
+            and a.card_no = #{cardNo}
+        </if>
+    </select>
+
+
+    <!-- 根据姓名查询用户 -->
+    <select id="getByName" resultType="User" parameterType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name!=null and name!=''">
+            and a.name like
+            <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+        </if>
+        <if test="loginName !=null and loginName!=''">
+            and a.login_name like
+            <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+        </if>
+        <if test="cardNo !=null and cardNo!=''">
+            and a.card_no = #{cardNo}
+        </if>
+        <if test="companyId!=null and companyId !=''">
+            and a.company_id = #{companyId}
+        </if>
+        <if test="hrmFlag !=null and hrmFlag!=''">
+            and a.hrm_flag is null
+        </if>
+    </select>
+
+    <!--模糊查询用户数据-->
+    <select id="findListByName" resultType="User" parameterType="User">
+        SELECT
+        a.id,a.name,a.phone,a.photo as 'loginIp'
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name!=null and name!=''">
+            and a.name like
+            <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+        </if>
+        <if test="loginName !=null and loginName!=''">
+            and a.login_name like
+            <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+        </if>
+        <if test="companyId !=null and companyId !=''">
+            and a.company_id = #{companyId}
+        </if>
+        and a.name not like '%管理员%'
+        ORDER BY CONVERT(NAME USING gbk) COLLATE gbk_chinese_ci ASC
+    </select>
+
+    <!--最近已办任务模糊查询用户数据-->
+    <select id="toTaskFindListByName" resultType="User" parameterType="User">
+        SELECT
+        a.id,a.name,a.phone,a.photo as 'loginIp'
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name!=null and name!=''">
+            and a.name like
+            <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+        </if>
+        <if test="loginName !=null and loginName!=''">
+            and a.login_name like
+            <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+        </if>
+        <if test="companyId !=null and companyId !=''">
+            and a.company_id = #{companyId}
+        </if>
+        and a.name not like '%管理员%'
+        ORDER BY CONVERT(NAME USING gbk) COLLATE gbk_chinese_ci ASC
+    </select>
+
+
+    <!-- 查询该用户是否属于某一机构的用户 -->
+    <select id="findByCompanyId" resultType="User" parameterType="User">
+        SELECT
+        *
+        FROM sys_user a
+        WHERE a.del_flag = '0'
+        <if test="companyId!=null and companyId!=''">
+            and a.COMPANY_ID=#{companyId}
+        </if>
+        <if test="id!=null and id!=''">
+            and a.id=#{id}
+        </if>
+
+    </select>
+
+
+    <!-- 根据姓名查询用户 集合-->
+    <select id="getListByName" resultType="User" parameterType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name!=null and name!=''">
+            and a.name like
+            <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+        </if>
+        <if test="loginName !=null and loginName!=''">
+            and a.login_name like
+            <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+        </if>
+        <if test="cardNo !=null and cardNo!=''">
+            and a.card_no = #{cardNo}
+        </if>
+        <if test="companyId!=null and companyId !=''">
+            and a.company_id = #{companyId}
+        </if>
+        <if test="hrmFlag !=null and hrmFlag!=''">
+            and a.hrm_flag is null
+        </if>
+    </select>
+
+    <!-- 分页查询用户信息 -->
+    <select id="findList" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <include refid="userJoins"/>
+        <if test="role != null and role.id != null and role.id != ''">
+            JOIN sys_user_role ur ON ur.user_id = a.id AND ur.role_id = #{role.id}
+        </if>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="company != null and company.id != null and company.id != ''">
+            AND (c.id = #{company.id} OR c.parent_ids LIKE
+            <if test="dbName == 'oracle'">'%,'||#{company.id}||',%')</if>
+            <if test="dbName == 'mssql'">'%,'+#{company.id}+',%')</if>
+            <if test="dbName == 'mysql'">CONCAT('%,', #{company.id}, ',%'))</if>
+        </if>
+        <if test="office != null and office.id != null and office.id != ''">
+            AND (o.id = #{office.id} OR o.parent_ids LIKE
+            <if test="dbName == 'oracle'">'%,'||#{office.id}||',%')</if>
+            <if test="dbName == 'mssql'">'%,'+#{office.id}+',%')</if>
+            <if test="dbName == 'mysql'">CONCAT('%,', #{office.id}, ',%'))</if>
+        </if>
+        <!-- 如果不是超级管理员，则不显示超级管理员用户 -->
+        <if test="!currentUser.admin">
+            AND a.id != '1'
+        </if>
+        <if test="loginName != null and loginName != ''">
+            AND a.login_name like
+            <if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+            <if test="dbName == 'mysql'">CONCAT('%', #{loginName}, '%')</if>
+        </if>
+        <if test="name != null and name != ''">
+            AND a.name like
+            <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+            <if test="dbName == 'mysql'">CONCAT('%', #{name}, '%')</if>
+        </if>
+        <!-- 数据范围过滤 -->
+        ${sqlMap.dsf}
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.company_id ,a.office_id, a.no
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 根据OfficeId获取用户（树查询用户时用） -->
+    <select id="findUserByOfficeId" resultType="User" useCache="true">
+		SELECT
+			a.id, a.name, a.login_name,a.checkAll,b.label as 'grade'
+		FROM sys_user a
+        LEFT JOIN sys_addpostgrade b ON a.GRADE = b.value AND b.DEL_FLAG = 0
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.office_id = #{office.id}
+		ORDER BY a.no
+	</select>
+
+    <!-- 根CompanyId获取用户 -->
+    <select id="findUserByCompanyId" resultType="User">
+        SELECT
+        a.id, a.name, a.login_name,a.checkAll
+        FROM sys_user a
+        WHERE a.del_flag = #{delFlag}
+        AND a.company_id = #{companyId}
+        ORDER BY a.name
+    </select>
+
+    <!-- 根据角色名称来查询集团管理员的机构id -->
+    <select id="findUserByRoleName" resultType="User" useCache="true">
+        SELECT
+        s.id,s.company_id
+        FROM sys_user s,sys_user_role a,sys_role  r
+        where a.ROLE_ID=r.ID
+        and s.id=a.USER_ID
+        and r.name='集团管理员'
+        and s.del_flag='0'
+    </select>
+
+    <!-- 查询全部用户 -->
+    <select id="findAllList" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM sys_user a
+        <include refid="userJoins"/>
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        ORDER BY a.no
+    </select>
+
+    <!-- 查询全部用户数目 -->
+    <select id="findAllCount" resultType="long">
+		SELECT
+			COUNT(1)
+		FROM sys_user a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+
+
+    <!-- 插入用户 -->
+    <insert id="insert">
+		INSERT INTO sys_user(
+			id, 
+			company_id, 
+			office_id, 
+			login_name, 
+			password, 
+			no, 
+			name,
+            sex,
+			email,
+			phone, 
+			mobile, 
+			user_type, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date,
+			remarks,
+			login_flag, 
+			photo, 
+			del_flag,
+            grade,
+            leader_ship,
+            ac_name,
+            dept,
+            ac_dept_name,
+            card_no,
+            level2,
+            level2_name,
+            level1,
+            level1_name,
+            hrm_flag,
+            work_post,
+            checkAll
+		) VALUES (
+			#{id}, 
+			#{company.id}, 
+			#{office.id}, 
+			#{loginName}, 
+			#{password}, 
+			#{no}, 
+			#{name}, 
+			#{sex},
+			#{email},
+			#{phone}, 
+			#{mobile}, 
+			#{userType}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{loginFlag}, 
+			#{photo}, 
+			#{delFlag},
+			#{grade},
+			#{leaderShip},
+			#{acName},
+			#{dept},
+			#{acDeptName},
+			#{cardNo},
+			#{level2},
+			#{level2Name},
+			#{level1},
+			#{level1Name},
+			#{hrmFlag},
+			#{workPost},
+			#{checkAll}
+		)
+	</insert>
+
+    <!-- 更新用户 -->
+    <update id="update">
+        UPDATE sys_user SET
+        company_id = #{company.id}
+        <if test="office.id != null and office.id !=''">
+            ,office_id = #{office.id}
+        </if>
+        <if test="loginName != null and loginName !=''">
+            ,login_name = #{loginName}
+        </if>
+        <if test="password != null and password !=''">
+            , password = #{password}
+        </if>
+        <if test="no != null and no !=''">
+            ,no = #{no}
+        </if>
+        <if test="name != null and name !=''">
+            ,name = #{name}
+        </if>
+        <if test="sex != null and sex !=''">
+            ,sex = #{sex}
+        </if>
+        <if test="email != null and email !=''">
+            ,email = #{email}
+        </if>
+        <if test="phone != null and phone !=''">
+            , phone = #{phone}
+        </if>
+        <if test="mobile != null and mobile !=''">
+            , mobile = #{mobile}
+        </if>
+        <if test="userType != null and userType !=''">
+            , user_type = #{userType}
+        </if>
+        <if test="updateBy != null and updateBy.id != null and updateBy.id !=''">
+            , update_by = #{updateBy.id}
+        </if>
+        <if test="updateDate != null and updateDate !=''">
+            , update_date = #{updateDate}
+        </if>
+        <if test="remarks != null and remarks !=''">
+            , remarks = #{remarks}
+        </if>
+        <if test="loginFlag != null and loginFlag !=''">
+            , login_flag = #{loginFlag}
+        </if>
+        <if test="photo != null and photo !=''">
+            ,photo = #{photo}
+        </if>
+        <if test="grade != null and grade !=''">
+            ,grade=#{grade}
+        </if>
+        <if test="leaderShip != null and leaderShip !=''">
+            , leader_ship=#{leaderShip}
+        </if>
+        <if test="acName != null and acName !=''">
+            , ac_name=#{acName}
+        </if>
+        <if test="dept != null and dept !=''">
+            , dept=#{dept}
+        </if>
+        <if test="acDeptName != null and acDeptName !=''">
+            , ac_dept_name=#{acDeptName}
+        </if>
+        <if test="cardNo != null and cardNo !=''">
+            , card_no=#{cardNo}
+        </if>
+        <if test="level2 != null and level2 !=''">
+            ,level2=#{level2}
+        </if>
+        <if test="level2Name != null and level2Name !=''">
+            ,level2_name=#{level2Name}
+        </if>
+        <if test="level1 != null and level1 !=''">
+            ,level1=#{level1}
+        </if>
+        <if test="level1Name != null and level1Name !=''">
+            ,level1_name=#{level1Name}
+        </if>
+        <if test="hrmFlag != null and hrmFlag !=''">
+            ,hrm_flag=#{hrmFlag}
+        </if>
+        <if test="workPost != null and workPost !=''">
+            ,work_post=#{workPost}
+        </if>
+        <if test="checkAll != null and checkAll !=''">
+            ,checkAll=#{checkAll}
+        </if>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新用户 -->
+    <update id="updateByCardNo">
+     UPDATE sys_user SET
+     del_flag=#{delFlag}
+     where card_no = #{cardNo} and company_id= #{company.id}
+    </update>
+
+
+
+    <!-- 删除用户和角色关联表数据 -->
+    <delete id="deleteUserRole">
+		DELETE FROM sys_user_role WHERE user_id = #{id}
+	</delete>
+
+    <!-- 插入用户和角色关联表数据 -->
+    <insert id="insertUserRole">
+        INSERT INTO sys_user_role(user_id, role_id)
+        <foreach collection="roleList" item="role" separator=" union all ">
+            SELECT #{id}, #{role.id}
+            <if test="dbName != 'mssql'">
+                FROM dual
+            </if>
+        </foreach>
+    </insert>
+
+    <insert id="insertUserR">
+        INSERT INTO sys_user_role(user_id, role_id)value(#{userId},#{roleId})
+    </insert>
+
+    <!-- 更新用户信息  -->
+    <update id="updateUserInfo">
+		UPDATE sys_user SET 
+			email = #{email}, 
+			phone = #{phone}, 
+			mobile = #{mobile}, 
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks},
+			photo = #{photo},
+			card_no=#{cardNo}
+		WHERE id = #{id}
+	</update>
+
+    <!-- 更新用户密码 -->
+    <update id="updatePasswordByCardNo">
+		UPDATE sys_user SET 
+			password = #{password}
+		WHERE card_no = #{cardNo}
+	</update>
+
+    <!-- 更新用户手机号 -->
+    <update id="updatePhoneByCardNo">
+        UPDATE sys_user SET card_no = #{cardNo}
+        <if test="(phone != null and phone !='') and (mobile eq null or mobile eq '')">
+            ,phone = #{phone} , mobile = #{phone}
+        </if>
+        <if test="(mobile != null and mobile !='') and (phone eq null or phone eq '')">
+            ,phone = #{mobile} , mobile = #{mobile}
+        </if>
+        <if test="(mobile != null and mobile !='') and (phone != null and phone !='')">
+          ,phone = #{phone} , mobile = #{mobile}
+        </if>
+        WHERE card_no = #{cardNo}
+    </update>
+
+
+    <!-- 更新登录信息，如登录IP、登录时间 -->
+    <update id="updateLoginInfo">
+		UPDATE sys_user SET 
+			login_ip = #{loginIp}, 
+			login_Date = #{loginDate} 
+		WHERE id = #{id}
+	</update>
+
+    <!-- 逻辑删除用户 -->
+    <update id="delete">
+		UPDATE sys_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+    <!-- 逻辑删除用户根据身份证号和机构id来逻辑删除 -->
+    <update id="deleteByCardNo">
+        UPDATE sys_user SET
+        del_flag = #{DEL_FLAG_DELETE}
+        WHERE card_no = #{cardNo} and company_id= #{company.id}
+    </update>
+
+
+
+
+    <update id="updateLeaveTotal">
+        UPDATE sys_user SET
+            leader_ship = #{hrmFlag}, ac_name=#{loginName},
+            dept = #{hrmFlag}, ac_dept_name=#{loginName},
+            level1 = #{hrmFlag}, level1_name=#{loginName}
+        WHERE
+            (
+            leader_ship = #{id}
+             AND company_id =#{companyId}
+             )
+           OR (
+             dept = #{id}
+              AND company_id = #{companyId}
+             )
+          OR (
+             level1 =  #{id}
+              AND company_id = #{companyId}
+             )
+    </update>
+
+    <!--离职人员权限明细更新-->
+    <update id="updateLeave">
+        UPDATE sys_user SET
+        <if test="remarks == '2'.toString() and remarks !=null ">
+            leader_ship = #{hrmFlag}, ac_name=#{loginName}
+        </if>
+        <if test="remarks == '3'.toString() and remarks !=null ">
+            dept = #{hrmFlag}, ac_dept_name=#{loginName}
+        </if>
+        <if test="remarks == '4'.toString() and remarks !=null ">
+            level1 = #{hrmFlag}, level1_name=#{loginName}
+        </if>
+        WHERE
+        <if test="remarks == '2'.toString() and remarks !=null ">
+            company_id= #{companyId}  and id in (${id})
+        </if>
+        <if test="remarks == '3'.toString() and remarks !=null ">
+            company_id= #{companyId} and id in (${id})
+        </if>
+        <if test="remarks == '4'.toString() and remarks !=null ">
+            company_id= #{companyId} and id in (${id})
+        </if>
+    </update>
+
+
+    <!-- 查询某个角色的人物 -->
+    <select id="findByUser" resultType="user">
+        select s.login_name
+        from sys_user s where
+        s.del_flag='0'
+        <if test="roleName !=null and roleName!=''">
+            and s.name=#{roleName}
+        </if>
+        <if test="id!=null and id !=''">
+            and s.company_id=#{id}
+        </if>
+    </select>
+
+    <!-- 根据姓名查询登录名 -->
+    <select id="findByName" resultType="User">
+        select *
+        from sys_user
+        where del_flag='0'
+        <if test="name !=null and name!=''">
+            and name=#{name}
+        </if>
+        <if test="cardNo !=null and cardNo!=''">
+            and card_no=#{cardNo}
+        </if>
+        <if test="companyId !=null and companyId!=''">
+            and company_id=#{companyId}
+        </if>
+
+    </select>
+    <insert id="insertUserFace">
+        INSERT INTO face_vs_person(person_uuid, id_card,img_id)
+        VALUES ( #{personUuid}, #{cardNo},#{imageId})
+    </insert>
+
+    <!-- 根据角色名称来查询集团管理员的机构id -->
+    <select id="findCompanyByRoleName" resultType="User" useCache="true">
+        SELECT
+        company_id
+        FROM sys_user s,sys_user_role a,sys_role  r
+        where a.ROLE_ID=r.ID
+        and s.id=a.USER_ID
+        and r.name=#{name} and s.name=#{acName}
+        and s.del_flag='0'
+    </select>
+
+    <!--查询所有的没有直属领导人员-->
+    <select id="findPeopleNoDept" resultType="User">
+        SELECT
+        a.id, a.name, b.name loginName, b.id officeId
+        FROM sys_user a,sys_office b
+        WHERE (a.LEADER_SHIP='' or a.LEADER_SHIP is null)
+        and a.leaderNotNull = '1'
+        and a.company_id= #{companyId}
+        and a.del_flag = '0'
+        and a.office_id=b.id
+        AND OFFICE_ID not in (SELECT OFFICE_ID from sys_user where OFFICE_ID like '%admin%')
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.office_id
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--查询所有部门-->
+    <select id="findAllOffice" resultType="Office">
+        SELECT DISTINCT(id) id,`name`
+        FROM sys_office a
+        WHERE  a.ID like concat('%',#{companyId},'%') and LENGTH(id) != 9
+        and ID in
+        (select DISTINCT(id) from sys_office where ID not in
+        (select id from sys_office where id like '%admin%'))
+    </select>
+
+    <!--查询所有直属领导-->
+    <select id="findAllOfficeLeader" resultType="User">
+        SELECT a.id,a.`NAME` as leaderShip,#{officeId} officeId, (SELECT `name` from sys_office WHERE id = #{officeId}) acName  from sys_user a
+        LEFT JOIN sys_office b
+        on a.OFFICE_ID=b.ID
+        where a.id = (
+        SELECT LEADER_SHIP id from sys_user
+        where COMPANY_ID = #{companyId}
+        and OFFICE_ID = #{officeId}
+        and LEADER_SHIP !=''
+        LIMIT 0,1)
+    </select>
+
+    <!--查询所有部门领导-->
+    <select id="findAllOfficeDept" resultType="User">
+        SELECT a.id,a.`NAME` as deptName, #{officeId} officeId from sys_user a
+        LEFT JOIN sys_office b
+        on a.OFFICE_ID=b.ID
+        where a.id = (
+        SELECT DEPT id from sys_user
+        where COMPANY_ID = #{companyId}
+        and OFFICE_ID = #{officeId}
+        and DEPT !=''
+        LIMIT 0,1)
+    </select>
+    <!--查询所有一级领导-->
+    <select id="findAllOfficeLevel" resultType="User">
+        SELECT a.id,a.`NAME` as acLevel1, #{officeId} officeId from sys_user a
+        LEFT JOIN sys_office b
+        on a.OFFICE_ID=b.ID
+        where a.id = (
+        SELECT LEVEL1 id from sys_user
+        where COMPANY_ID = #{companyId}
+        and LEVEL1 !=''
+        LIMIT 0,1)
+    </select>
+    <select id="selectLoginnameByGradeAndOffice" resultType="User">
+        SELECT
+            a.id, a.LOGIN_NAME as 'loginName', a.name
+        FROM
+            sys_user a
+        where a.OFFICE_ID = #{officeId} and del_flag = 0
+        <if test="grades != null and grades.size() > 0">
+            <foreach collection="grades" item="grade" open=" and a.grade in (" close=")" separator=",">
+                #{grade}
+            </foreach>
+        </if>
+        order by a.grade
+    </select>
+
+    <!--修改所有没有直属领导人员-->
+    <update id="updateNoLeader">
+        UPDATE sys_user SET
+        <if test="leaderShip !=null and leaderShip!=''">
+            leader_ship = #{leaderShip},
+            ac_name = #{acName},
+        </if>
+        <if test="dept !=null and dept!=''">
+            dept = #{dept},
+            ac_dept_name = #{acDeptName},
+        </if>
+        <if test="level1 !=null and level1!=''">
+            level1 = #{level1},
+            level1_name = #{level1Name},
+        </if>
+        leaderNotNull = #{leaderNotNull}
+        WHERE company_id = #{companyId}
+        and id = #{id}
+    </update>
+
+    <select id="selectAllPhone" resultType="com.thinkgem.jeesite.modules.sys.entity.UserPhone">
+        SELECT
+            a.NAME, a.PHONE, b.NAME AS 'dept', c.LABEL AS 'grade', a.EMAIL
+        FROM
+            sys_user a
+                LEFT JOIN sys_office b ON a.OFFICE_ID = b.ID
+                LEFT JOIN sys_addpostgrade c ON a.GRADE = c.VALUE AND c.DEL_FLAG = 0
+        WHERE a.DEL_FLAG = 0
+          AND a.PHONE IS NOT NULL
+          AND a.PHONE != ''
+          AND a.COMPANY_ID = #{companyId}
+        order by a.NAME
+    </select>
+</mapper>

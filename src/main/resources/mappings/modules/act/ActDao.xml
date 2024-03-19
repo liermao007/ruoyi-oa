@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.act.dao.ActDao">
+    
+	<update id="updateProcInsIdByBusinessId">
+		UPDATE ${businessTable} SET 
+			proc_ins_id = #{procInsId}
+		WHERE id = #{businessId}
+	</update>
+
+    <select id="findTaskName" resultType="java.lang.String">
+        ${sql}
+    </select>
+
+
+
+    <select id="doneList" resultType="Act">
+        SELECT
+            h.`PROC_INST_ID_` AS 'taskId', m.`title`AS 'title',
+            m.`table_name` AS 'taskDefKey', t.`name_` AS 'taskName', s.`NAME` AS 'comment',
+            u.name AS 'cs',
+            h.PROC_DEF_ID_
+        FROM act_hi_taskinst h
+        LEFT JOIN oa_form_master m ON m.form_no =LEFT(h.PROC_DEF_ID_, LOCATE(':',h.PROC_DEF_ID_)-1)
+        LEFT JOIN  act_ru_task t ON t.proc_inst_id_ =h.`PROC_INST_ID_`
+        LEFT JOIN sys_user s ON t.`ASSIGNEE_` =s.`LOGIN_NAME`
+        LEFT JOIN act_hi_identitylink a ON a.proc_inst_id_=h.`PROC_INST_ID_` AND a.type_='starter'
+        LEFT JOIN sys_user u ON u.login_name=a.`USER_ID_`
+        WHERE h.ASSIGNEE_ = #{CS}
+        GROUP BY h.`PROC_INST_ID_`
+        ORDER BY h.end_time_ DESC
+            LIMIT   10
+    </select>
+
+    <select id="getByProcInsId" resultType="Act">
+      SELECT
+     act_id_ as 'taskId',
+     act_name_ as 'taskName',
+     assignee_ as 'CS'
+      FROM act_hi_actinst
+      WHERE PROC_INST_ID_ =#{procInsId}
+    </select>
+    <!--查询最近已办任务-->
+    <select id="oaHasToDoTask"  resultType="Act">
+        SELECT
+        DISTINCT
+        h.`PROC_INST_ID_`as taskId ,
+        m.`table_name` as taskDefKey,
+        m.`ALIAS` as taskName,
+        date_format(h.START_TIME_, '%Y-%m-%d') as startTime ,
+        u.name as CS,
+        SUBSTRING_INDEX(h.proc_def_id_, ':', 1)  AS "procDefId"
+
+        FROM
+        act_hi_taskinst h
+        LEFT JOIN oa_form_master m ON m.form_no =LEFT(h.PROC_DEF_ID_, LOCATE(':',h.PROC_DEF_ID_)-1)
+        LEFT JOIN act_hi_identitylink a ON a.proc_inst_id_=h.`PROC_INST_ID_` AND a.type_="starter"<!-- 固定的-->
+        LEFT JOIN sys_user u ON u.login_name = a.`USER_ID_`
+        <!--  WHERE h.ASSIGNEE_ =#{loginName}  ${} 赋值标签 可以将实体类中的参数对象名称直接写在括号里边 必须得一直 可以赋值 tangzm-->
+        <where>
+            <if test="loginName != null and loginName != ''">
+                AND h.ASSIGNEE_ = #{loginName}
+            </if>
+            <if test="procDefId != null and procDefId != ''">
+                AND h.proc_def_id_ = #{procDefId}
+            </if>
+            <if test="applyUserId != null and applyUserId != ''">
+                AND a.`USER_ID_` = #{applyUserId}
+            </if>
+        </where>
+        ORDER BY h.end_time_ DESC
+    </select>
+
+    <!--模糊查询用户数据-->
+    <select id="findListByName" resultType="User" parameterType="User">
+        SELECT
+        a.id,a.name,a.phone,a.photo as 'loginIp'
+        FROM sys_user a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="name!=null and name!=''">
+            and a.name like
+            <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+        </if>
+        <if test="loginName !=null and loginName!=''">
+            and a.login_name like
+            <if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+        </if>
+        <if test="companyId !=null and companyId !=''">
+            and a.company_id = #{companyId}
+        </if>
+        and a.name not like '%管理员%'
+        ORDER BY CONVERT(NAME USING gbk) COLLATE gbk_chinese_ci ASC
+    </select>
+
+
+    <select id="findGd" resultType="java.lang.String">
+        SELECT
+        u.name as 'CS'
+        FROM act_hi_actinst a
+          LEFT JOIN sys_user u ON u.login_name=a.assignee_
+        WHERE act_id_ =#{gd} and PROC_INST_ID_ =#{procInsId} limit 1
+    </select>
+
+</mapper>

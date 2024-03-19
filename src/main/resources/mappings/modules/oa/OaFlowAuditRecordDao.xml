@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OaFlowAuditRecordDao">
+    
+	<sql id="oaFlowAuditRecordColumns">
+		a.id AS "id",
+		a.table_name AS "tableName",
+		a.record_id AS "recordId",
+		a.sig_data AS "sigData",
+		a.sig AS "sig",
+		a.sig_data_base64 AS "sigDataBase64",
+		a.sig_server AS "sigServer",
+		a.ts AS "ts",
+		a.sig_pic AS "sigPic",
+		a.audit_result AS "auditResult",
+		a.audit_comment AS "auditComment",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="oaFlowAuditRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="OaFlowAuditRecord">
+		SELECT 
+			<include refid="oaFlowAuditRecordColumns"/>
+		FROM oa_flow_audit_record a
+		<include refid="oaFlowAuditRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OaFlowAuditRecord">
+		SELECT 
+			<include refid="oaFlowAuditRecordColumns"/>
+		FROM oa_flow_audit_record a
+		<include refid="oaFlowAuditRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OaFlowAuditRecord">
+		SELECT 
+			<include refid="oaFlowAuditRecordColumns"/>
+		FROM oa_flow_audit_record a
+		<include refid="oaFlowAuditRecordJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oa_flow_audit_record(
+			id,
+			table_name,
+			record_id,
+			sig_data,
+			sig,
+			sig_data_base64,
+			sig_server,
+			ts,
+			sig_pic,
+			audit_result,
+			audit_comment,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{tableName},
+			#{recordId},
+			#{sigData},
+			#{sig},
+			#{sigDataBase64},
+			#{sigServer},
+			#{ts},
+			#{sigPic},
+			#{auditResult},
+			#{auditComment},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_flow_audit_record SET 	
+			table_name = #{tableName},
+			record_id = #{recordId},
+			sig_data = #{sigData},
+			sig = #{sig},
+			sig_data_base64 = #{sigDataBase64},
+			sig_server = #{sigServer},
+			ts = #{ts},
+			sig_pic = #{sigPic},
+			audit_result = #{auditResult},
+			audit_comment = #{auditComment},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE oa_flow_audit_record SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

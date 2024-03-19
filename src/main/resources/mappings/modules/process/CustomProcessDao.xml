@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.CustomProcessDao">
+    
+	<sql id="customProcessColumns">
+		a.id AS "id",
+		a.content AS "content",
+		a.title AS "title",
+		a.org_id AS "orgId",
+		a.dept_id AS "deptId",
+		a.name AS "name",
+		a.del_flag AS "delFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.proc_inst_id AS "procInstId",
+		a.recall AS "recall",
+		a.FJMC AS "FJMC",
+		a.FJLJ AS "FJLJ"
+	</sql>
+	
+	<sql id="customProcessJoins">
+	</sql>
+    
+	<select id="get" resultType="CustomProcess">
+		SELECT 
+			<include refid="customProcessColumns"/>
+		FROM custom_process a
+		<include refid="customProcessJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CustomProcess">
+		SELECT 
+			<include refid="customProcessColumns"/>
+		FROM custom_process a
+		<include refid="customProcessJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="procInstId != null and procInstId != ''">
+                and a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and a.create_by = #{createBy.id}
+            </if>
+        </where>
+        order by a.create_date desc
+	</select>
+	
+	<select id="findAllList" resultType="CustomProcess">
+		SELECT 
+			<include refid="customProcessColumns"/>
+		FROM custom_process a
+		<include refid="customProcessJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="name != null and name != ''">
+                AND a.name LIKE
+                <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO custom_process(
+			id,
+			content,
+			title,
+			org_id,
+			dept_id,
+			name,
+			del_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			proc_inst_id,
+			recall,
+			FJLJ,
+			FJMC
+		) VALUES (
+			#{id},
+			#{content},
+			#{title},
+			#{orgId},
+			#{deptId},
+			#{name},
+			#{delFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{procInstId},
+			#{recall},
+			#{FJLJ},
+			#{FJMC}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE custom_process SET 	
+			content = #{content},
+			title = #{title},
+			org_id = #{orgId},
+			dept_id = #{deptId},
+			name = #{name},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			proc_inst_id = #{procInstId},
+			recall = #{recall},
+			FJLJ = #{FJLJ},
+			FJMC = #{FJMC}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE custom_process SET
+			recall = #{recall}
+		WHERE proc_inst_id = #{procInstId}
+	</update>
+	
+</mapper>

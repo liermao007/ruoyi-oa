@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.MedicalOperationReportDao">
+    
+	<sql id="medicalOperationReportColumns">
+		a.id AS "id",
+		a.daily_income AS "dailyIncome",
+		a.daily_outpatient_clinic AS "dailyOutpatientClinic",
+		a.daily_hospitalization AS "dailyHospitalization",
+		a.diurnal_urgency AS "diurnalUrgency",
+		a.daily_outpatient_number AS "dailyOutpatientNumber",
+		a.daily_emergency AS "dailyEmergency",
+		a.admission_number AS "admissionNumber",
+		a.discharge_number AS "dischargeNumber",
+		a.hospital_people AS "hospitalPeople",
+		a.operation_number AS "operationNumber",
+		a.diurnal_outpatient_operation AS "diurnalOutpatientOperation",
+		a.daily_operation AS "dailyOperation",
+		a.doctors_number AS "doctorsNumber",
+		a.bed_day AS "bedDay",
+		a.outpatient_volume_average AS "outpatientVolumeAverage",
+		a.total_medical_income AS "totalMedicalIncome",
+		a.nurses_number AS "nursesNumber",
+		a.nurses_bed_day AS "nursesBedDay",
+		a.nurses_medical_income AS "nursesMedicalIncome",
+		a.medical_people_number AS "medicalPeopleNumber",
+		a.medical_department_total_income AS "medicalDepartmentTotalIncome",
+		a.month_bed_day AS "monthBedDay",
+		a.current_sum_date AS "currentSumDate",
+		a.org_id AS "orgId",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.total_num_hospital AS "totalNumHospital",
+		a.doctor_num AS "doctorNum",
+		a.total_cost_hospital AS "totalCostHospital",
+		a.total_cost_people AS "totalCostPeople",
+		a.medical_num AS "medicalNum",
+		a.nurse_num AS "nurseNum",
+		a.medical_auxiliary_num AS "medicalAuxiliaryNum",
+		a.medical_number AS "medicalNumber",
+		a.logistical_number AS "logisticalNumber",
+		a.administrative_number AS "administrativeNumber",
+        a.ct_check AS  "ctCheck",
+        a.ct_doctor AS "ctDoctor" ,
+        a.ultrasonic_check AS "ultrasonicCheck",
+        a.ultrasonic_doctor AS "ultrasonicDoctor",
+        a.x_check AS "xCheck",
+        a.x_doctor AS "xDoctor",
+        a.nmr_check  AS "nmrCheck",
+        a.nmr_doctor AS "nmrDoctor",
+		a.del_flag AS "delFlag"
+	</sql>
+
+    <!--月份表列表-->
+    <sql id="medicalOperationReportMonthsColumns">
+        a.id AS "id",
+        a.daily_income_months AS "dailyIncomeMonths",
+        a.daily_outpatient_clinic_months AS "dailyOutpatientClinicMonths",
+        a.daily_hospitalization_months AS "dailyHospitalizationMonths",
+        a.diurnal_urgency_months AS "diurnalUrgencyMonths",
+        a.daily_outpatient_number_months AS "dailyOutpatientNumberMonths",
+        a.daily_emergency_months AS "dailyEmergencyMonths",
+        a.admission_number_months AS "admissionNumberMonths",
+        a.discharge_number_months AS "dischargeNumberMonths",
+        a.hospital_people_months AS "hospitalPeopleMonths",
+        a.operation_number_months AS "operationNumberMonths",
+        a.diurnal_outpatient_operation_months AS "diurnalOutpatientOperationMonths",
+        a.daily_operation_months AS "dailyOperationMonths",
+        a.current_months AS "currentMonths",
+        a.org_id AS "orgId",
+        a.create_by AS "createBy.id",
+        a.update_by AS "updateBy.id",
+        a.create_date AS "createDate",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag"
+    </sql>
+
+    <!--年份表列表-->
+    <sql id="medicalOperationReportYearColumns">
+        a.id AS "id",
+        a.current_year AS "currentYear",
+        a.org_id AS "orgId",
+        a.create_by AS "createBy.id",
+        a.update_by AS "updateBy.id",
+        a.create_date AS "createDate",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.daily_income_year AS "dailyIncomeYear",
+        a.daily_outpatient_clinic_year AS "dailyOutpatientClinicYear",
+        a.daily_hospitalization_year AS "dailyHospitalizationYear",
+        a.diurnal_urgency_year AS "diurnalUrgencyYear",
+        a.daily_outpatient_number_year AS "dailyOutpatientNumberYear",
+        a.daily_emergency_year AS "dailyEmergencyYear",
+        a.admission_number_year AS "admissionNumberYear",
+        a.discharge_number_year AS "dischargeNumberYear",
+        a.hospital_people_year AS "hospitalPeopleYear",
+        a.operation_number_year AS "operationNumberYear",
+        a.diurnal_outpatient_operation_year AS "diurnalOutpatientOperationYear",
+        a.daily_operation_year AS "dailyOperationYear"
+    </sql>
+
+
+    <sql id="medicalOperationReportMYColumns">
+        a.id AS "id",
+        a.daily_income AS "dailyIncome",
+        a.daily_outpatient_clinic AS "dailyOutpatientClinic",
+        a.daily_hospitalization AS "dailyHospitalization",
+        a.diurnal_urgency AS "diurnalUrgency",
+        a.daily_outpatient_number AS "dailyOutpatientNumber",
+        a.daily_emergency AS "dailyEmergency",
+        a.admission_number AS "admissionNumber",
+        a.discharge_number AS "dischargeNumber",
+        a.hospital_people AS "hospitalPeople",
+        a.operation_number AS "operationNumber",
+        a.diurnal_outpatient_operation AS "diurnalOutpatientOperation",
+        a.daily_operation AS "dailyOperation",
+        a.doctors_number AS "doctorsNumber",
+        a.bed_day AS "bedDay",
+        a.outpatient_volume_average AS "outpatientVolumeAverage",
+        a.total_medical_income AS "totalMedicalIncome",
+        a.nurses_number AS "nursesNumber",
+        a.nurses_bed_day AS "nursesBedDay",
+        a.nurses_medical_income AS "nursesMedicalIncome",
+        a.medical_people_number AS "medicalPeopleNumber",
+        a.medical_department_total_income AS "medicalDepartmentTotalIncome",
+        a.month_bed_day AS "monthBedDay",
+        a.current_sum_date AS "currentSumDate",
+        s.name AS "orgId",
+        a.create_by AS "createBy.id",
+        a.update_by AS "updateBy.id",
+        a.create_date AS "createDate",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        b.daily_income_months AS "dailyIncomeMonths",
+        b.daily_outpatient_clinic_months AS "dailyOutpatientClinicMonths",
+        b.daily_hospitalization_months AS "dailyHospitalizationMonths",
+        b.diurnal_urgency_months AS "diurnalUrgencyMonths",
+        b.daily_outpatient_number_months AS "dailyOutpatientNumberMonths",
+        b.daily_emergency_months AS "dailyEmergencyMonths",
+        b.admission_number_months AS "admissionNumberMonths",
+        b.discharge_number_months AS "dischargeNumberMonths",
+        b.hospital_people_months AS "hospitalPeopleMonths",
+        b.operation_number_months AS "operationNumberMonths",
+        b.diurnal_outpatient_operation_months AS "diurnalOutpatientOperationMonths",
+        b.daily_operation_months AS "dailyOperationMonths",
+        b.current_months AS "currentMonths",
+        d.daily_income_year AS "dailyIncomeYear",
+        d.daily_outpatient_clinic_year AS "dailyOutpatientClinicYear",
+        d.daily_hospitalization_year AS "dailyHospitalizationYear",
+        d.diurnal_urgency_year AS "diurnalUrgencyYear",
+        d.daily_outpatient_number_year AS "dailyOutpatientNumberYear",
+        d.daily_emergency_year AS "dailyEmergencyYear",
+        d.admission_number_year AS "admissionNumberYear",
+        d.discharge_number_year AS "dischargeNumberYear",
+        d.hospital_people_year AS "hospitalPeopleYear",
+        d.operation_number_year AS "operationNumberYear",
+        d.diurnal_outpatient_operation_year AS "diurnalOutpatientOperationYear",
+        d.daily_operation_year AS "dailyOperationYear"
+    </sql>
+	
+	<sql id="medicalOperationReportJoins">
+	</sql>
+    
+	<select id="get" resultType="MedicalOperationReport">
+		SELECT
+        a.id AS "id",
+        a.daily_income AS "dailyIncomeOld",
+        a.daily_outpatient_clinic AS "dailyOutpatientClinicOld",
+        a.daily_hospitalization AS "dailyHospitalizationOld",
+        a.diurnal_urgency AS "diurnalUrgencyOld",
+        a.daily_outpatient_number AS "dailyOutpatientNumberOld",
+        a.daily_emergency AS "dailyEmergencyOld",
+        a.admission_number AS "admissionNumberOld",
+        a.discharge_number AS "dischargeNumberOld",
+        a.hospital_people AS "hospitalPeopleOld",
+        a.operation_number AS "operationNumberOld",
+        a.diurnal_outpatient_operation AS "diurnalOutpatientOperationOld",
+        a.daily_operation AS "dailyOperationOld",
+        a.doctors_number AS "doctorsNumberOld",
+        a.bed_day AS "bedDayOld",
+        a.outpatient_volume_average AS "outpatientVolumeAverageOld",
+        a.total_medical_income AS "totalMedicalIncomeOld",
+        a.nurses_number AS "nursesNumberOld",
+        a.nurses_bed_day AS "nursesBedDayOld",
+        a.nurses_medical_income AS "nursesMedicalIncomeOld",
+        a.medical_people_number AS "medicalPeopleNumberOld",
+        a.medical_department_total_income AS "medicalDepartmentTotalIncomeOld",
+        a.month_bed_day AS "monthBedDayOld",
+        a.current_sum_date AS "currentSumDate",
+        a.org_id AS "orgId",
+        a.create_by AS "createBy.id",
+        a.update_by AS "updateBy.id",
+        a.create_date AS "createDate",
+        a.update_date AS "updateDate",
+        a.del_flag AS "delFlag",
+        a.total_num_hospital AS "totalNumHospitalOld",
+        a.doctor_num AS "doctorNumOld",
+        a.total_cost_hospital AS "totalCostHospitalOld",
+        a.total_cost_people AS "totalCostPeopleOld",
+        a.medical_num AS "medicalNumOld"
+		FROM medical_operation_report a
+		<include refid="medicalOperationReportJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+    <select id="getByOld" resultType="MedicalOperationReport">
+        SELECT
+        <include refid="medicalOperationReportColumns"/>
+        FROM medical_operation_report a
+        <include refid="medicalOperationReportJoins"/>
+        WHERE a.id = #{id}
+    </select>
+	
+	<select id="findList" resultType="MedicalOperationReport">
+		SELECT 
+			<include refid="medicalOperationReportColumns"/>
+		FROM medical_operation_report a
+		<include refid="medicalOperationReportJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="orgId != null and orgId != ''">
+                and a.org_id=#{orgId}
+            </if>
+            <if test="currentSumDate != null and currentSumDate != ''">
+                and a.current_sum_date=#{currentSumDate}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+
+
+    <!--日月年查询-->
+    <select id="findAllList" resultType="MedicalOperationReport">
+        SELECT
+        a.id AS "id",
+        a.daily_income AS "dailyIncome",
+        a.daily_outpatient_clinic AS "dailyOutpatientClinic",
+        a.daily_hospitalization AS "dailyHospitalization",
+        a.diurnal_urgency AS "diurnalUrgency",
+        a.daily_outpatient_number AS "dailyOutpatientNumber",
+        a.daily_emergency AS "dailyEmergency",
+        a.admission_number AS "admissionNumber",
+        a.discharge_number AS "dischargeNumber",
+        a.hospital_people AS "hospitalPeople",
+        a.operation_number AS "operationNumber",
+        a.diurnal_outpatient_operation AS "diurnalOutpatientOperation",
+        a.daily_operation AS "dailyOperation",
+        a.total_num_hospital AS "totalNumHospital",
+        a.doctor_num AS "doctorNum",
+        a.nurse_num AS "nurseNum",
+        a.medical_auxiliary_num AS "medicalAuxiliaryNum",
+        a.medical_number AS "medicalNumber",
+        a.logistical_number AS "logisticalNumber",
+        a.administrative_number AS "administrativeNumber",
+        a.total_cost_hospital AS "totalCostHospital",
+        a.total_cost_people AS "totalCostPeople",
+        a.medical_num AS "medicalNum",
+        a.logistic_num  AS "logisticNum",
+        a.ct_check AS  "ctCheck",
+        a.ct_doctor AS "ctDoctor" ,
+        a.ultrasonic_check AS "ultrasonicCheck",
+        a.ultrasonic_doctor AS "ultrasonicDoctor",
+        a.x_check AS "xCheck",
+        a.x_doctor AS "xDoctor",
+        a.nmr_check  AS "nmrCheck",
+        a.nmr_doctor AS "nmrDoctor",
+        s.name AS "orgId",
+        s.id AS "org",
+        d.*, b.*
+        FROM sys_office s,
+            (SELECT
+            SUM(a.daily_income) AS "dailyIncomeYear",
+            SUM(a.daily_outpatient_clinic) AS "dailyOutpatientClinicYear",
+            SUM(a.daily_hospitalization) AS "dailyHospitalizationYear",
+            SUM(a.diurnal_urgency) AS "diurnalUrgencyYear",
+            SUM(a.daily_outpatient_number) AS "dailyOutpatientNumberYear",
+            SUM(a.daily_emergency) AS "dailyEmergencyYear",
+            SUM(a.admission_number) AS "admissionNumberYear",
+            SUM(a.discharge_number) AS "dischargeNumberYear",
+            SUM(a.hospital_people) AS "hospitalPeopleYear",
+            SUM(a.operation_number) AS "operationNumberYear",
+            SUM(a.diurnal_outpatient_operation) AS "diurnalOutpatientOperationYear",
+            SUM(a.daily_operation) AS "dailyOperationYear",
+            org_id as org
+            FROM medical_operation_report a
+            WHERE DATE_FORMAT(a.current_sum_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{currentSumDate}, '%Y-%m-%d')
+                and DATE_FORMAT(a.current_sum_date, '%Y') = DATE_FORMAT(#{currentSumDate}, '%Y')
+            group by org_id) d
+        LEFT  JOIN
+                (SELECT
+                SUM(a.daily_income) AS "dailyIncomeMonths",
+                SUM(a.daily_outpatient_clinic) AS "dailyOutpatientClinicMonths",
+                SUM(a.daily_hospitalization) AS "dailyHospitalizationMonths",
+                SUM(a.diurnal_urgency) AS "diurnalUrgencyMonths",
+                SUM(a.daily_outpatient_number) AS "dailyOutpatientNumberMonths",
+                SUM(a.daily_emergency) AS "dailyEmergencyMonths",
+                SUM(a.admission_number) AS "admissionNumberMonths",
+                SUM(a.discharge_number) AS "dischargeNumberMonths",
+                SUM(a.hospital_people) AS "hospitalPeopleMonths",
+                SUM(a.operation_number) AS "operationNumberMonths",
+                SUM(a.diurnal_outpatient_operation) AS "diurnalOutpatientOperationMonths",
+                SUM(a.daily_operation) AS "dailyOperationMonths",
+                org_id as org
+                FROM medical_operation_report a
+                WHERE DATE_FORMAT(a.current_sum_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{currentSumDate}, '%Y-%m-%d')
+                    and DATE_FORMAT(a.current_sum_date, '%Y-%m') = DATE_FORMAT(#{currentSumDate}, '%Y-%m')
+                group by org_id)  b
+          ON d.org = b.org
+        LEFT  JOIN medical_operation_report a ON d.org = a.org_id  AND DATE_FORMAT(a.current_sum_date,'%Y-%m-%d')=DATE_FORMAT(#{currentSumDate},'%Y-%m-%d') AND a.del_flag = '0'
+        <where> s.id = d.org
+            <if test="orgIds != null and orgIds != '' and !currentUser.admin">
+                and d.org  in
+                <foreach collection="orgIds" item="orgIds" index="index"
+                         open="(" close=")" separator=",">
+                    #{orgIds}
+                </foreach>
+            </if>
+        </where>
+        order by s.SORT
+    </select>
+
+	
+	<insert id="insert">
+		INSERT INTO medical_operation_report(
+			id,
+			daily_income,
+			daily_outpatient_clinic,
+			daily_hospitalization,
+			diurnal_urgency,
+			daily_outpatient_number,
+			daily_emergency,
+			admission_number,
+			discharge_number,
+			hospital_people,
+			operation_number,
+			diurnal_outpatient_operation,
+			daily_operation,
+			doctors_number,
+			bed_day,
+			outpatient_volume_average,
+			current_sum_date,
+			org_id,
+			create_by,
+			update_by,
+			create_date,
+			update_date,
+			del_flag,
+			total_medical_income,
+			nurses_number,
+			nurses_bed_day,
+			nurses_medical_income,
+			medical_people_number,
+			medical_department_total_income,
+			month_bed_day,
+			total_num_hospital,
+			doctor_num,
+			nurse_num,
+			medical_auxiliary_num,
+			medical_number,
+			logistical_number,
+			administrative_number,
+			total_cost_hospital,
+			total_cost_people,
+			medical_num,
+			logistic_num,
+            ct_check,
+            ct_doctor,
+            ultrasonic_check,
+            ultrasonic_doctor,
+            x_check,
+            x_doctor,
+            nmr_check,
+            nmr_doctor
+		) VALUES (
+			#{id},
+			#{dailyIncome},
+			#{dailyOutpatientClinic},
+			#{dailyHospitalization},
+			#{diurnalUrgency},
+			#{dailyOutpatientNumber},
+			#{dailyEmergency},
+			#{admissionNumber},
+			#{dischargeNumber},
+			#{hospitalPeople},
+			#{operationNumber},
+			#{diurnalOutpatientOperation},
+			#{dailyOperation},
+			#{doctorsNumber},
+			#{bedDay},
+			#{outpatientVolumeAverage},
+			#{currentSumDate},
+			#{orgId},
+			#{createBy.id},
+			#{updateBy.id},
+			#{createDate},
+			#{updateDate},
+			#{delFlag},
+			#{totalMedicalIncome},
+			#{nursesNumber},
+			#{nursesBedDay},
+			#{nursesMedicalIncome},
+			#{medicalPeopleNumber},
+			#{medicalDepartmentTotalIncome},
+			#{monthBedDay},
+			#{totalNumHospital},
+			#{doctorNum},
+            #{nurseNum},
+            #{medicalAuxiliaryNum},
+            #{medicalNumber},
+            #{logisticalNumber},
+            #{administrativeNumber},
+			#{totalCostHospital},
+			#{totalCostPeople},
+			#{medicalNum},
+			#{logisticNum},
+			#{ctCheck},
+            #{ctDoctor},
+            #{ultrasonicCheck},
+            #{ultrasonicDoctor},
+            #{xCheck},
+            #{xDoctor},
+            #{nmrCheck},
+            #{nmrDoctor}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE medical_operation_report SET 	
+			daily_income = #{dailyIncome},
+			daily_outpatient_clinic = #{dailyOutpatientClinic},
+			daily_hospitalization = #{dailyHospitalization},
+			diurnal_urgency = #{diurnalUrgency},
+			daily_outpatient_number = #{dailyOutpatientNumber},
+			daily_emergency = #{dailyEmergency},
+			admission_number = #{admissionNumber},
+			discharge_number = #{dischargeNumber},
+			hospital_people = #{hospitalPeople},
+			operation_number = #{operationNumber},
+			diurnal_outpatient_operation = #{diurnalOutpatientOperation},
+			daily_operation = #{dailyOperation},
+			doctors_number = #{doctorsNumber},
+			bed_day = #{bedDay},
+			outpatient_volume_average = #{outpatientVolumeAverage},
+			current_sum_date = #{currentSumDate},
+			org_id = #{orgId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			total_medical_income = #{totalMedicalIncome},
+			nurses_number = #{nursesNumber},
+			nurses_bed_day = #{nursesBedDay},
+			nurses_medical_income = #{nursesMedicalIncome},
+			medical_people_number = #{medicalPeopleNumber},
+			medical_department_total_income = #{medicalDepartmentTotalIncome},
+			month_bed_day = #{monthBedDay},
+			total_num_hospital = #{totalNumHospital},
+			doctor_num = #{doctorNum},
+			total_cost_hospital = #{totalCostHospital},
+			total_cost_people =#{totalCostPeople},
+			medical_num =#{medicalNum},
+			logistic_num = #{logisticNum},
+			ct_check = #{ctCheck},
+			nurse_num = #{nurseNum},
+			medical_auxiliary_num = #{medicalAuxiliaryNum},
+			medical_number = #{medicalNumber},
+			logistical_number = #{logisticalNumber},
+			administrative_number = #{administrativeNumber},
+            ct_doctor = #{ctDoctor},
+            ultrasonic_check = #{ultrasonicCheck},
+            ultrasonic_doctor = #{ultrasonicDoctor},
+            x_check = #{xCheck},
+            x_doctor =  #{xDoctor},
+            nmr_check = #{nmrCheck},
+            nmr_doctor = #{nmrDoctor}
+		WHERE id = #{id}
+	</update>
+
+
+    <insert id="insertMonths">
+        INSERT INTO medical_operation_report_months(
+        id,
+        daily_income_months,
+        daily_outpatient_clinic_months,
+        daily_hospitalization_months,
+        diurnal_urgency_months,
+        daily_outpatient_number_months,
+        daily_emergency_months,
+        admission_number_months,
+        discharge_number_months,
+        hospital_people_months,
+        operation_number_months,
+        diurnal_outpatient_operation_months,
+        daily_operation_months,
+        current_months,
+        org_id,
+        create_by,
+        update_by,
+        create_date,
+        update_date,
+        del_flag
+        ) VALUES (
+        #{id},
+        #{dailyIncomeMonths},
+        #{dailyOutpatientClinicMonths},
+        #{dailyHospitalizationMonths},
+        #{diurnalUrgencyMonths},
+        #{dailyOutpatientNumberMonths},
+        #{dailyEmergencyMonths},
+        #{admissionNumberMonths},
+        #{dischargeNumberMonths},
+        #{hospitalPeopleMonths},
+        #{operationNumberMonths},
+        #{diurnalOutpatientOperationMonths},
+        #{dailyOperationMonths},
+        #{currentMonths},
+        #{orgId},
+        #{createBy.id},
+        #{updateBy.id},
+        #{createDate},
+        #{updateDate},
+        #{delFlag}
+        )
+    </insert>
+
+    <update id="updateMonths">
+        UPDATE medical_operation_report_months SET
+        daily_income_months = #{dailyIncomeMonths},
+        daily_outpatient_clinic_months = #{dailyOutpatientClinicMonths},
+        daily_hospitalization_months = #{dailyHospitalizationMonths},
+        diurnal_urgency_months = #{diurnalUrgencyMonths},
+        daily_outpatient_number_months = #{dailyOutpatientNumberMonths},
+        daily_emergency_months = #{dailyEmergencyMonths},
+        admission_number_months = #{admissionNumberMonths},
+        discharge_number_months = #{dischargeNumberMonths},
+        hospital_people_months = #{hospitalPeopleMonths},
+        operation_number_months = #{operationNumberMonths},
+        diurnal_outpatient_operation_months = #{diurnalOutpatientOperationMonths},
+        daily_operation_months = #{dailyOperationMonths},
+        current_months = #{currentMonths},
+        org_id = #{orgId},
+        update_by = #{updateBy.id},
+        update_date = #{updateDate}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertYear">
+        INSERT INTO medical_operation_report_year(
+        id,
+        current_year,
+        org_id,
+        create_by,
+        update_by,
+        create_date,
+        update_date,
+        del_flag,
+        daily_income_year,
+        daily_outpatient_clinic_year,
+        daily_hospitalization_year,
+        diurnal_urgency_year,
+        daily_outpatient_number_year,
+        daily_emergency_year,
+        admission_number_year,
+        discharge_number_year,
+        hospital_people_year,
+        operation_number_year,
+        diurnal_outpatient_operation_year,
+        daily_operation_year
+        ) VALUES (
+        #{id},
+        #{currentYear},
+        #{orgId},
+        #{createBy.id},
+        #{updateBy.id},
+        #{createDate},
+        #{updateDate},
+        #{delFlag},
+        #{dailyIncomeYear},
+        #{dailyOutpatientClinicYear},
+        #{dailyHospitalizationYear},
+        #{diurnalUrgencyYear},
+        #{dailyOutpatientNumberYear},
+        #{dailyEmergencyYear},
+        #{admissionNumberYear},
+        #{dischargeNumberYear},
+        #{hospitalPeopleYear},
+        #{operationNumberYear},
+        #{diurnalOutpatientOperationYear},
+        #{dailyOperationYear}
+        )
+    </insert>
+
+    <update id="updateYear">
+        UPDATE medical_operation_report_year SET
+        current_year = #{currentYear},
+        org_id = #{orgId},
+        update_by = #{updateBy.id},
+        update_date = #{updateDate},
+        daily_income_year = #{dailyIncomeYear},
+        daily_outpatient_clinic_year = #{dailyOutpatientClinicYear},
+        daily_hospitalization_year = #{dailyHospitalizationYear},
+        diurnal_urgency_year = #{diurnalUrgencyYear},
+        daily_outpatient_number_year = #{dailyOutpatientNumberYear},
+        daily_emergency_year = #{dailyEmergencyYear},
+        admission_number_year = #{admissionNumberYear},
+        discharge_number_year = #{dischargeNumberYear},
+        hospital_people_year = #{hospitalPeopleYear},
+        operation_number_year = #{operationNumberYear},
+        diurnal_outpatient_operation_year = #{diurnalOutpatientOperationYear},
+        daily_operation_year = #{dailyOperationYear}
+        WHERE id = #{id}
+    </update>
+	
+	<update id="delete">
+		UPDATE medical_operation_report SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+    <select id="findListByMonths" resultType="MedicalOperationReport">
+        SELECT
+        <include refid="medicalOperationReportMonthsColumns"/>
+        FROM medical_operation_report_months a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="currentMonths != null and currentMonths != ''">
+                and a.current_months = #{currentMonths}
+            </if>
+            <if test="orgId != null and orgId != ''">
+                and a.org_id = #{orgId}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findListByYear" resultType="MedicalOperationReport">
+        SELECT
+        <include refid="medicalOperationReportYearColumns"/>
+        FROM medical_operation_report_year a
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            <if test="currentYear != null and currentYear != ''">
+                and a.current_year = #{currentYear}
+            </if>
+            <if test="orgId != null and orgId != ''">
+                and a.org_id = #{orgId}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+	
+</mapper>

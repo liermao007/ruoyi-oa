@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.SmsSetDao">
+    
+	<sql id="SmsSetColumns">
+		a.id AS "id",
+		a.company_id AS "companyId",
+		a.company_name AS "companyName",
+		a.is_send AS "isSend",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.remarks AS "remarks"
+	</sql>
+	<sql id="SmsSetJoins">
+	</sql>
+
+	<insert id="insert">
+		INSERT INTO sms_set(
+			id,
+			company_id,
+			company_name,
+		    is_send,
+			create_by,
+		    create_date,
+		    update_by,
+		    update_date,
+	    	del_flag,
+	    	remarks
+		) VALUES (
+			#{id},
+			#{companyId},
+			#{companyName},
+			#{isSend},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sms_set a SET
+		    a.is_send = #{isSend},
+ 		    a.update_by = #{updateBy.id},
+ 		    a.update_date = #{updateDate}
+		WHERE
+		a.company_id = #{companyId}
+	</update>
+	
+	<delete id="del" parameterType="java.lang.String">
+		delete from  sms_set
+		WHERE company_id = #{id}
+	</delete>
+
+	<select id="getById" resultType="SmsSet">
+		SELECT
+		s.*
+		FROM sms_set s
+		where s.company_id = #{id}
+		AND s.del_flag = '0'
+	</select>
+
+	<select id="getByIdDel" resultType="SmsSet">
+		SELECT
+		s.*
+		FROM sms_set s
+		where s.company_id = #{id}
+		AND s.del_flag = '1'
+	</select>
+
+	<select id="findAll" resultType="java.lang.String">
+		SELECT
+		a.id companyId, a.TABLE_COMMENT tableName
+		FROM oa_person_define_table a
+		where b.COMPANY_ID = #{id}
+	</select>
+
+
+	<select id="mechanism" resultType="SmsSet">
+		SELECT
+		<include refid="SmsSetColumns"/>
+		FROM sms_set a, sys_office b
+		where a.company_id = b.id
+		AND a.company_id = #{id}
+		and a.del_flag = '0'
+	</select>
+
+	<select id="superMechanism" resultType="SmsSet">
+		SELECT
+		<include refid="SmsSetColumns"/>
+		FROM  sms_set a,sys_office b
+		where a.company_id = b.id
+		and a.del_flag = '0'
+	</select>
+
+	<select id="findCompany" resultType="SmsSet">
+		SELECT
+		a.id, a.name companyName
+		FROM  sys_office a
+		where length(id) = 9
+		AND a.del_flag = '0'
+	</select>
+
+	<select id="findCompanyIsSend" resultType="java.lang.String">
+		SELECT
+		a.is_send isSend
+		FROM  sms_set a
+		where  a.company_id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oaStatistics.dao.OaStatisticsTableDao">
+    <sql id="OaStatisticsNameColumns">
+        id AS id,
+        TJID AS statisticsId,
+        TJBMC AS statisticsName,
+        data_table AS dataTable,
+        create_date AS createDate,
+        create_by AS createBy,
+        update_by AS updateBy,
+        update_date AS updateDate,
+        remarks AS remarks,
+        del_flag AS delFlag
+    </sql>
+
+    <select id="findAll" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsTable">
+        SELECT
+         <include refid="OaStatisticsNameColumns"></include>
+         FROM oa_statistics_table
+        WHERE
+        TJID = #{statisticsId}
+    </select>
+
+
+    <select id="get" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsTable">
+        SELECT
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM
+        oa_statistics_table
+        WHERE 1=1
+        <if test="id != null and id != ''"  >
+           AND id = #{id}
+        </if>
+        <if test="statisticsId != null and statisticsId != ''"  >
+           AND TJID = #{statisticsId}
+        </if>
+        <if test="statisticsName != null and statisticsName != ''"  >
+          AND TJBMC = #{statisticsName}
+        </if>
+        <if test="dataTable != null and dataTable != ''"  >
+          AND  data_table = #{dataTable}
+        </if>
+        <if test="createDate != null and createDate != ''"  >
+          AND  create_date = #{createDate}
+        </if>
+        <if test="createBy != null and createBy != ''"  >
+          AND create_by = #{createBy}
+        </if>
+        <if test="updateBy != null and updateBy != ''"  >
+          AND update_by = #{updateBy}
+        </if>
+        <if test="updateDate != null and updateDate != ''"  >
+          AND update_date = #{updateDate}
+        </if>
+        <if test="remarks != null and remarks != ''"  >
+          AND remarks = #{remarks}
+        </if>
+        <if test="delFlag != null and delFlag != ''"  >
+          AND del_flag = #{delFlag}
+        </if>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO
+        oa_statistics_table
+        (
+        id,
+        TJID,
+        TJBMC,
+        data_table,
+        create_date,
+        create_by,
+        update_by,
+        update_date,
+        remarks,
+        del_flag
+        )VALUES
+        (
+        #{id},
+        #{statisticsId},
+        #{statisticsName},
+        #{dataTable},
+        #{createDate},
+        #{createBy.id},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE
+        FROM
+        oa_statistics_table
+        WHERE
+        <if test="statisticsId != null and statisticsId != '' ">
+            TJID = #{statisticsId}
+        </if>
+        <if test="id != null and id != '' ">
+            id = #{id}
+        </if>
+    </delete>
+</mapper>

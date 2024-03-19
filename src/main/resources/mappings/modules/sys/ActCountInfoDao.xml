@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.ActCountInfoDao">
+    
+	<sql id="actCountInfoColumns">
+		a.id AS "id",
+		a.proc_inst_id AS "procInstId",
+		a.proc_def_id AS "procDefId",
+		a.table_name AS "tableName",
+		a.login_name AS "loginName",
+		a.company_id AS "companyId",
+		a.proc_state AS "procState",
+		a.regect_state AS "regectState",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate"
+	</sql>
+	
+	<sql id="actCountInfoJoins">
+	</sql>
+    
+	<select id="get" resultType="ActCountInfo">
+		SELECT 
+			<include refid="actCountInfoColumns"/>
+		FROM act_count_info a
+		<include refid="actCountInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ActCountInfo">
+		SELECT
+        a.id AS "id",
+        a.proc_inst_id AS "procInstId",
+        SUBSTRING_INDEX( a.proc_def_id, ':', 1)  AS "procDefId",
+        a.table_name AS "tableName",
+        u.name AS "loginName",
+        o.name AS "companyId",
+        a.proc_state AS "procState",
+        a.regect_state AS "regectState",
+        a.create_by AS "createBy.id",
+        a.create_date AS "createDate",
+        a.update_by AS "updateBy.id",
+        a.update_date AS "updateDate",
+        a.act_name AS "actName",
+        s.name AS "assignee",
+         SUBSTRING_INDEX( p.business_key_, ':', -1) as  "businessKey"
+        FROM
+        act_count_info a
+        LEFT JOIN sys_user u
+        ON u.login_name = a.login_name
+        LEFT JOIN sys_user s
+        ON s.login_name = a.assignee
+        LEFT JOIN sys_office o
+        ON o.id = a.company_id
+        LEFT JOIN act_hi_procinst p
+        ON p.proc_inst_id_ = a.proc_inst_id
+        <where>
+
+			<if test="procInstId != null and procInstId != ''">
+				AND a.proc_inst_id = #{procInstId}
+			</if>
+			<if test="procDefId != null and procDefId != ''">
+				AND SUBSTRING_INDEX(a.proc_def_id, ':', 1) IN  (${procDefId})
+            </if>
+			<if test="tableName != null and tableName != ''">
+				AND a.table_name = #{tableName}
+			</if>
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name = #{loginName}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="procState != null and procState != ''">
+				AND a.proc_state = #{procState}
+			</if>
+			<if test="regectState != null and regectState != ''">
+				AND a.regect_state = #{regectState}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+			<if test="createDate != null and createDate != ''">
+				 AND DATE_FORMAT(a.create_date, '%Y-%m-%d') = DATE_FORMAT(#{createDate}, '%Y-%m-%d')
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="ActCountInfo">
+		SELECT 
+			<include refid="actCountInfoColumns"/>
+		FROM act_count_info a
+		<include refid="actCountInfoJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+    <select id="findInfonByProcInsId" resultType="ActCountInfo">
+         SELECT
+        i.id AS "id",
+         a.task_def_key_ AS "procInstId",
+        r.task_def_key_ AS "actId",
+        r.name_ AS "actName",
+        r.assignee_ AS "assignee"
+        FROM
+        act_hi_taskinst a
+        LEFT JOIN act_count_info i ON i.PROC_INST_ID = a.PROC_INST_ID_
+         LEFT JOIN act_ru_task r
+        ON r.proc_inst_id_ = i.proc_inst_id
+        WHERE
+        a.PROC_INST_ID_ = #{procInsId}
+        AND r.task_def_key_ NOT LIKE 'apply_cs%'
+    </select>
+    <select id="findInfonByProcInsIds" resultType="ActCountInfo">
+        SELECT
+        i.id AS "id",
+        a.task_def_key_ AS "procInstId"
+        FROM
+        act_hi_taskinst a
+        LEFT JOIN act_count_info i ON i.PROC_INST_ID = a.PROC_INST_ID_
+        WHERE
+        a.PROC_INST_ID_ = #{procInsId}
+    </select>
+
+
+	<insert id="insert">
+		INSERT INTO act_count_info(
+			id,
+			proc_inst_id,
+			proc_def_id,
+			table_name,
+			login_name,
+			company_id,
+			proc_state,
+			regect_state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			act_name,
+			assignee
+		) VALUES (
+			#{id},
+			#{procInstId},
+			#{procDefId},
+			#{tableName},
+			#{loginName},
+			#{companyId},
+			#{procState},
+			#{regectState},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{actName},
+			#{assignee}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE act_count_info SET
+			proc_state = #{procState},
+			regect_state = #{regectState},
+			act_name = #{actName},
+			assignee = #{assignee}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM act_count_info
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

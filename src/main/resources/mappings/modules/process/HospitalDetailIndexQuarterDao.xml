@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.HospitalDetailIndexQuarterDao">
+    
+	<sql id="hospitalDetailIndexQuarterColumns">
+		a.id AS "id",
+		a.org_id AS "orgId",
+		a.master_id AS "masterId",
+		a.quarter AS "quarter",
+		a.group_cash_budgetary_amount_quarter AS "groupCashBudgetaryAmountQuarter",
+		a.group_cash_actual_amount_quarter AS "groupCashActualAmountQuarter",
+		a.medical_income_budgetary_amount_quarter AS "medicalIncomeBudgetaryAmountQuarter",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.medical_income_actual_amount_quarter AS "medicalIncomeActualAmountQuarter",
+		a.update_by AS "updateBy.id",
+		a.cost_expenditure_budgetary_amount_quarter AS "costExpenditureBudgetaryAmountQuarter",
+		a.update_date AS "updateDate",
+		a.cost_expenditure_actual_amount_quarter AS "costExpenditureActualAmountQuarter",
+		a.profit_budgetary_amount_quarter AS "profitBudgetaryAmountQuarter",
+		a.del_flag AS "delFlag",
+		a.profit_actual_amount_quarter AS "profitActualAmountQuarter",
+		a.operation_index_budgetary_amount_quarter AS "operationIndexBudgetaryAmountQuarter",
+		a.operation_index_actual_amount_quarter AS "operationIndexActualAmountQuarter",
+		a.purchasing_rate_budgetary_amount_quarter AS "purchasingRateBudgetaryAmountQuarter",
+		a.purchasing_rate_actual_amount_quarter AS "purchasingRateActualAmountQuarter",
+		a.quality_standard_budgetary_amount_quarter AS "qualityStandardBudgetaryAmountQuarter",
+		a.quality_standard_actual_amount_quarter AS "qualityStandardActualAmountQuarter"
+	</sql>
+	
+	<sql id="hospitalDetailIndexQuarterJoins">
+	</sql>
+    
+	<select id="get" resultType="HospitalDetailIndexQuarter">
+		SELECT 
+			<include refid="hospitalDetailIndexQuarterColumns"/>
+		FROM hospital_detail_index_quarter a
+		<include refid="hospitalDetailIndexQuarterJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="HospitalDetailIndexQuarter">
+		SELECT 
+			<include refid="hospitalDetailIndexQuarterColumns"/>
+		FROM hospital_detail_index_quarter a
+		<include refid="hospitalDetailIndexQuarterJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="HospitalDetailIndexQuarter">
+		SELECT 
+			<include refid="hospitalDetailIndexQuarterColumns"/>
+		FROM hospital_detail_index_quarter a
+		<include refid="hospitalDetailIndexQuarterJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hospital_detail_index_quarter(
+			id,
+			org_id,
+			master_id,
+			quarter,
+			group_cash_budgetary_amount_quarter,
+			group_cash_actual_amount_quarter,
+			medical_income_budgetary_amount_quarter,
+			create_by,
+			create_date,
+			medical_income_actual_amount_quarter,
+			update_by,
+			cost_expenditure_budgetary_amount_quarter,
+			update_date,
+			cost_expenditure_actual_amount_quarter,
+			profit_budgetary_amount_quarter,
+			del_flag,
+			profit_actual_amount_quarter,
+			operation_index_budgetary_amount_quarter,
+			operation_index_actual_amount_quarter,
+			purchasing_rate_budgetary_amount_quarter,
+			purchasing_rate_actual_amount_quarter,
+			quality_standard_budgetary_amount_quarter,
+			quality_standard_actual_amount_quarter
+		) VALUES (
+			#{id},
+			#{orgId},
+			#{masterId},
+			#{quarter},
+			#{groupCashBudgetaryAmountQuarter},
+			#{groupCashActualAmountQuarter},
+			#{medicalIncomeBudgetaryAmountQuarter},
+			#{createBy.id},
+			#{createDate},
+			#{medicalIncomeActualAmountQuarter},
+			#{updateBy.id},
+			#{costExpenditureBudgetaryAmountQuarter},
+			#{updateDate},
+			#{costExpenditureActualAmountQuarter},
+			#{profitBudgetaryAmountQuarter},
+			#{delFlag},
+			#{profitActualAmountQuarter},
+			#{operationIndexBudgetaryAmountQuarter},
+			#{operationIndexActualAmountQuarter},
+			#{purchasingRateBudgetaryAmountQuarter},
+			#{purchasingRateActualAmountQuarter},
+			#{qualityStandardBudgetaryAmountQuarter},
+			#{qualityStandardActualAmountQuarter}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hospital_detail_index_quarter SET 	
+			org_id = #{orgId},
+			master_id = #{masterId},
+			quarter = #{quarter},
+			group_cash_budgetary_amount_quarter = #{groupCashBudgetaryAmountQuarter},
+			group_cash_actual_amount_quarter = #{groupCashActualAmountQuarter},
+			medical_income_budgetary_amount_quarter = #{medicalIncomeBudgetaryAmountQuarter},
+			medical_income_actual_amount_quarter = #{medicalIncomeActualAmountQuarter},
+			update_by = #{updateBy.id},
+			cost_expenditure_budgetary_amount_quarter = #{costExpenditureBudgetaryAmountQuarter},
+			update_date = #{updateDate},
+			cost_expenditure_actual_amount_quarter = #{costExpenditureActualAmountQuarter},
+			profit_budgetary_amount_quarter = #{profitBudgetaryAmountQuarter},
+			profit_actual_amount_quarter = #{profitActualAmountQuarter},
+			operation_index_budgetary_amount_quarter = #{operationIndexBudgetaryAmountQuarter},
+			operation_index_actual_amount_quarter = #{operationIndexActualAmountQuarter},
+			purchasing_rate_budgetary_amount_quarter = #{purchasingRateBudgetaryAmountQuarter},
+			purchasing_rate_actual_amount_quarter = #{purchasingRateActualAmountQuarter},
+			quality_standard_budgetary_amount_quarter = #{qualityStandardBudgetaryAmountQuarter},
+			quality_standard_actual_amount_quarter = #{qualityStandardActualAmountQuarter}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateMonths">
+        UPDATE hospital_detail_index_months SET
+        org_id = #{orgId},
+        master_id = #{masterId},
+        month = #{month},
+        group_cash_budgetary_amount_months = #{groupCashBudgetaryAmountMonths},
+        group_cash_actual_amount_months = #{groupCashActualAmountMonths},
+        medical_income_budgetary_amount_months = #{medicalIncomeBudgetaryAmountMonths},
+        medical_income_actual_amount_months = #{medicalIncomeActualAmountMonths},
+        update_by = #{updateBy.id},
+        cost_expenditure_budgetary_amount_months = #{costExpenditureBudgetaryAmountMonths},
+        update_date = #{updateDate},
+        cost_expenditure_actual_amount_months = #{costExpenditureActualAmountMonths},
+        profit_budgetary_amount_months = #{profitBudgetaryAmountMonths},
+        profit_actual_amount_months = #{profitActualAmountMonths},
+        operation_index_budgetary_amount_months = #{operationIndexBudgetaryAmountMonths},
+        operation_index_actual_amount_months = #{operationIndexActualAmountMonths},
+        purchasing_rate_budgetary_amount_months = #{purchasingRateBudgetaryAmountMonths},
+        purchasing_rate_actual_amount_months = #{purchasingRateActualAmountMonths},
+        quality_standard_budgetary_amount_months = #{qualityStandardBudgetaryAmountMonths},
+        quality_standard_actual_amount_months = #{qualityStandardActualAmountMonths}
+        WHERE id = #{id}
+    </update>
+	
+	<update id="delete">
+		UPDATE hospital_detail_index_quarter SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

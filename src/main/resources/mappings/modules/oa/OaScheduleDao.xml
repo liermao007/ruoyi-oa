@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OaScheduleDao">
+
+    <sql id="oaScheduleColumns">
+		a.id AS "id",
+		a.content AS "content",
+		a.important_level AS "importantLevel",
+		a.emergency_level AS "emergencyLevel",
+		a.schedule_date AS "scheduleDate",
+		a.flag AS "flag",
+		a.login_id AS "loginId"
+	</sql>
+
+    <sql id="oaScheduleJoins">
+    </sql>
+
+    <select id="get" resultType="OaSchedule">
+        SELECT
+        <include refid="oaScheduleColumns"/>
+
+        FROM oa_schedule a
+        <include refid="oaScheduleJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+
+
+    <select id="findOaSchedule" resultType="OaSchedule">
+        SELECT
+        a.id AS "id",
+        a.content AS "content",
+        a.important_level AS "importantLevel",
+        b.name AS "emergencyLevel",
+        a.schedule_date AS "scheduleDate",
+        a.flag AS "flag",
+        b.mobile AS "loginId"
+        FROM oa_schedule a,sys_user b
+        <include refid="oaScheduleJoins"/>
+        <where>
+            a.login_id=b.id
+            <if test="flag != null and flag != ''">
+                and a.flag = #{flag}
+            </if>
+
+            <if test="scheduleDate != null and scheduleDate != ''">
+                AND date_format(a.schedule_date,'%Y-%m-%d')=date_format(#{scheduleDate},'%Y-%m-%d')
+            </if>
+
+            <if test="loginId != null and loginId != ''">
+                AND a.login_id=#{loginId}
+            </if>
+        </where>
+        order by schedule_date asc
+
+    </select>
+
+
+
+
+    <select id="findList" resultType="OaSchedule">
+        SELECT
+        <include refid="oaScheduleColumns"/>
+        FROM oa_schedule a
+        <include refid="oaScheduleJoins"/>
+        <where>
+            <if test="flag != null and flag != ''">
+                a.flag = #{flag}
+            </if>
+
+            <if test="scheduleDate != null and scheduleDate != ''">
+                AND date_format(a.schedule_date,'%Y-%m-%d')=date_format(#{scheduleDate},'%Y-%m-%d')
+            </if>
+
+            <if test="loginId != null and loginId != ''">
+                AND a.login_id=#{loginId}
+            </if>
+        </where>
+             order by schedule_date asc
+
+    </select>
+
+
+
+    <select id="findAllList" resultType="OaSchedule">
+        SELECT
+        <include refid="oaScheduleColumns"/>
+        FROM oa_schedule a
+        <include refid="oaScheduleJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+		INSERT INTO oa_schedule(
+			id,
+			content,
+			important_level,
+			emergency_level,
+			schedule_date,
+			flag,
+			login_id
+		) VALUES (
+			#{id},
+			#{content},
+			#{importantLevel},
+			#{emergencyLevel},
+			#{scheduleDate},
+			#{flag},
+			#{loginId}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE oa_schedule SET 	
+			content = #{content},
+			important_level = #{importantLevel},
+			emergency_level = #{emergencyLevel},
+			schedule_date = #{scheduleDate},
+			flag = #{flag},
+			login_id=#{loginId}
+		WHERE id = #{id}
+	</update>
+
+    <update id="delete">
+		DELETE FROM oa_schedule
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oaStatistics.dao.OaStatisticsNameDao">
+    <sql id="OaStatisticsNameColumns">
+        n.id AS id,
+        n.STATISTICS_NAME AS statisticsName,
+        n.create_date AS createDate,
+        org_id AS orgId,
+        n.create_by AS createBy,
+        n.update_by AS updateBy,
+        n.update_date AS updateDate,
+        n.remarks AS remarks,
+        n.del_flag AS delFlag
+    </sql>
+
+
+    <select id="get" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsName">
+        SELECT
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM oa_statistics_name n
+        WHERE id=#{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO oa_statistics_name
+        (id,STATISTICS_NAME,org_id,create_date,create_by,update_by,update_date,remarks,del_flag)
+        VALUES
+        (#{id},#{statisticsName},#{orgId},#{createDate},#{createBy.id},#{updateBy.id},#{updateDate},#{remarks},#{delFlag})
+    </insert>
+
+    <select id="findAllList" resultType="com.thinkgem.jeesite.modules.oaStatistics.entity.OaStatisticsName">
+        SELECT
+        <include refid="OaStatisticsNameColumns"></include>
+        FROM oa_statistics_name n
+        WHERE 1=1
+        <if test="orgId != null and orgId != ''">
+            AND  org_id = #{orgId}
+        </if>
+    </select>
+
+    <update id="update">
+        UPDATE oa_statistics_name
+        SET
+        STATISTICS_NAME = #{statisticsName},
+        remarks = #{remarks},
+        del_flag = #{delFlag}
+        WHERE
+        id = #{id}
+    </update>
+
+    <update id="delete">
+        DELETE FROM oa_statistics_name WHERE id=#{id}
+    </update>
+</mapper>

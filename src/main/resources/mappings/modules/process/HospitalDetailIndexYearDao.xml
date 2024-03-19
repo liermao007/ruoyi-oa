@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.HospitalDetailIndexYearDao">
+    
+	<sql id="hospitalDetailIndexYearColumns">
+		a.id AS "id",
+		a.org_id AS "orgId",
+		a.master_id AS "masterId",
+		a.year AS "year",
+		a.group_cash_budgetary_amount_year AS "groupCashBudgetaryAmountYear",
+		a.group_cash_actual_amount_year AS "groupCashActualAmountYear",
+		a.medical_income_budgetary_amount_year AS "medicalIncomeBudgetaryAmountYear",
+		a.create_by AS "createBy.id",
+		a.medical_income_actual_amount_year AS "medicalIncomeActualAmountYear",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.cost_expenditure_budgetary_amount_year AS "costExpenditureBudgetaryAmountYear",
+		a.update_date AS "updateDate",
+		a.cost_expenditure_actual_amount_year AS "costExpenditureActualAmountYear",
+		a.del_flag AS "delFlag",
+		a.profit_budgetary_amount_year AS "profitBudgetaryAmountYear",
+		a.profit_actual_amount_year AS "profitActualAmountYear",
+		a.operation_index_budgetary_amount_year AS "operationIndexBudgetaryAmountYear",
+		a.operation_index_actual_amount_year AS "operationIndexActualAmountYear",
+		a.purchasing_rate_budgetary_amount_year AS "purchasingRateBudgetaryAmountYear",
+		a.purchasing_rate_actual_amount_year AS "purchasingRateActualAmountYear",
+		a.quality_standard_budgetary_amount_year AS "qualityStandardBudgetaryAmountYear",
+		a.quality_standard_actual_amount_year AS "qualityStandardActualAmountYear"
+	</sql>
+	
+	<sql id="hospitalDetailIndexYearJoins">
+	</sql>
+    
+	<select id="get" resultType="HospitalDetailIndexYear">
+		SELECT 
+			<include refid="hospitalDetailIndexYearColumns"/>
+		FROM hospital_detail_index_year a
+		<include refid="hospitalDetailIndexYearJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="HospitalDetailIndexYear">
+		SELECT 
+			<include refid="hospitalDetailIndexYearColumns"/>
+		FROM hospital_detail_index_year a
+		<include refid="hospitalDetailIndexYearJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="HospitalDetailIndexYear">
+		SELECT 
+			<include refid="hospitalDetailIndexYearColumns"/>
+		FROM hospital_detail_index_year a
+		<include refid="hospitalDetailIndexYearJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO hospital_detail_index_year(
+			id,
+			org_id,
+			master_id,
+			year,
+			group_cash_budgetary_amount_year,
+			group_cash_actual_amount_year,
+			medical_income_budgetary_amount_year,
+			create_by,
+			medical_income_actual_amount_year,
+			create_date,
+			update_by,
+			cost_expenditure_budgetary_amount_year,
+			update_date,
+			cost_expenditure_actual_amount_year,
+			del_flag,
+			profit_budgetary_amount_year,
+			profit_actual_amount_year,
+			operation_index_budgetary_amount_year,
+			operation_index_actual_amount_year,
+			purchasing_rate_budgetary_amount_year,
+			purchasing_rate_actual_amount_year,
+			quality_standard_budgetary_amount_year,
+			quality_standard_actual_amount_year
+		) VALUES (
+			#{id},
+			#{orgId},
+			#{masterId},
+			#{year},
+			#{groupCashBudgetaryAmountYear},
+			#{groupCashActualAmountYear},
+			#{medicalIncomeBudgetaryAmountYear},
+			#{createBy.id},
+			#{medicalIncomeActualAmountYear},
+			#{createDate},
+			#{updateBy.id},
+			#{costExpenditureBudgetaryAmountYear},
+			#{updateDate},
+			#{costExpenditureActualAmountYear},
+			#{delFlag},
+			#{profitBudgetaryAmountYear},
+			#{profitActualAmountYear},
+			#{operationIndexBudgetaryAmountYear},
+			#{operationIndexActualAmountYear},
+			#{purchasingRateBudgetaryAmountYear},
+			#{purchasingRateActualAmountYear},
+			#{qualityStandardBudgetaryAmountYear},
+			#{qualityStandardActualAmountYear}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE hospital_detail_index_year SET 	
+			org_id = #{orgId},
+			master_id = #{masterId},
+			year = #{year},
+			group_cash_budgetary_amount_year = #{groupCashBudgetaryAmountYear},
+			group_cash_actual_amount_year = #{groupCashActualAmountYear},
+			medical_income_budgetary_amount_year = #{medicalIncomeBudgetaryAmountYear},
+			medical_income_actual_amount_year = #{medicalIncomeActualAmountYear},
+			update_by = #{updateBy.id},
+			cost_expenditure_budgetary_amount_year = #{costExpenditureBudgetaryAmountYear},
+			update_date = #{updateDate},
+			cost_expenditure_actual_amount_year = #{costExpenditureActualAmountYear},
+			profit_budgetary_amount_year = #{profitBudgetaryAmountYear},
+			profit_actual_amount_year = #{profitActualAmountYear},
+			operation_index_budgetary_amount_year = #{operationIndexBudgetaryAmountYear},
+			operation_index_actual_amount_year = #{operationIndexActualAmountYear},
+			purchasing_rate_budgetary_amount_year = #{purchasingRateBudgetaryAmountYear},
+			purchasing_rate_actual_amount_year = #{purchasingRateActualAmountYear},
+			quality_standard_budgetary_amount_year = #{qualityStandardBudgetaryAmountYear},
+			quality_standard_actual_amount_year = #{qualityStandardActualAmountYear}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE hospital_detail_index_year SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

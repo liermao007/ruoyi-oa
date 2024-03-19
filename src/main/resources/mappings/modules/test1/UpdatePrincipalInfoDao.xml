@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.test1.dao.UpdatePrincipalInfoDao">
+
+    <insert id="insert">
+        INSERT INTO update_principalid_info(
+        id,
+        agentid,
+        principalid,
+        agent,
+        principal,
+        update_by,
+        update_date,
+        remarks,
+        del_flag,
+        PROC_INST_ID_,
+        bm
+        ) VALUES (
+        #{id},
+        #{agentId},
+        #{principalId},
+        #{agent},
+        #{principal},
+        #{updateBy.id},
+        #{updateDate},
+        #{remarks},
+        #{delFlag},
+        #{procinstId},
+        #{bm}
+        )
+    </insert>
+
+    <select id="findUpdate" resultType="UpdatePrincipalInfo">
+        SELECT
+        principal,
+        PROC_INST_ID_
+        FROM update_principalid_info
+        <where>
+            del_flag = '0' AND agentid = #{agentid}
+        </where>
+    </select>
+
+    <select id="findByPrincipalid" resultType="UpdatePrincipalInfo">
+        SELECT
+        agentid,
+        PROC_INST_ID_
+        FROM update_principalid_info
+        <where>
+            del_flag = '0' AND principalid = #{principalid}
+        </where>
+    </select>
+
+    <!--<select id="findUpdate1" resultType="UpdatePrincipalInfo">-->
+       <!--SELECT oa.title AS 'agent' FROM oa_form_master oa,(SELECT LEFT(PROC_DEF_ID_,LOCATE(':',PROC_DEF_ID_)-1) AS pr FROM act_hi_actinst a,update_principalid_info u WHERE u.PROC_INST_ID_ = a.PROC_INST_ID_ AND u.del_flag = '0' AND a.END_TIME_ IS NULL AND u.principalid = #{principalid}) oo-->
+        <!--WHERE oa.FORM_NO = oo.pr-->
+    <!--</select>-->
+
+    <select id="findUpdate1" resultType="Act">
+        SELECT
+        h.`PROC_INST_ID_` AS 'taskId', m.`title`AS 'title',
+        m.`table_name` AS 'taskDefKey', t.`agent` AS 'CSLoginNames',t.`principal` AS 'SFCC',
+--         CSLoginNames用于临时存储代理人,SFCC用于临时存储被代理人
+        date_format(h.START_TIME_, '%Y-%m-%d') as startTime ,
+        u.name AS 'cs',
+        h.PROC_DEF_ID_
+        FROM act_hi_taskinst h
+        LEFT JOIN oa_form_master m ON m.form_no =LEFT(h.PROC_DEF_ID_, LOCATE(':',h.PROC_DEF_ID_)-1)
+        LEFT JOIN  update_principalid_info t ON t.proc_inst_id_ =h.`PROC_INST_ID_`
+        LEFT JOIN act_hi_identitylink a ON a.proc_inst_id_=h.`PROC_INST_ID_` AND a.type_='starter'
+-- 		LEFT JOIN oa_run_process oa ON oa.AGENTID=t.`AGENTID`
+        LEFT JOIN sys_user u ON u.login_name=a.`USER_ID_`
+        WHERE t.agent = #{agent}
+        GROUP BY h.`PROC_INST_ID_`
+        ORDER BY h.end_time_ DESC
+        LIMIT   10
+    </select>
+
+    <select id="findComment" resultType="Act">
+        SELECT
+            t.`name_` AS 'taskName',
+			s.`NAME` AS 'comment'
+        FROM act_ru_task t
+        LEFT JOIN sys_user s ON t.`ASSIGNEE_` =s.`LOGIN_NAME`
+        WHERE t.PROC_INST_ID_ = #{procinstId}
+        LIMIT   1
+    </select>
+
+    <select id="find1" resultType="java.lang.String">
+        SELECT
+        principal
+        FROM oa_run_process
+        <where>
+            by_flag = '1' AND agent = #{agent}
+        </where>
+    </select>
+
+    <select id="find2" resultType="java.lang.String">
+        SELECT
+        agent
+        FROM oa_run_process
+        <where>
+            by_flag = '1' AND principal= #{principal}
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.CustomHiTaskinstDao">
+
+    <sql id="customHiTaskinstColumns">
+		a.id AS "id",
+		a.proc_inst_id AS "procInstId",
+		a.task_def_key AS "taskDefKey",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.assignee AS "assignee",
+		a.name AS "name",
+		a.reason AS "reason",
+		a.comment AS "comment"
+	</sql>
+
+    <sql id="customHiTaskinstJoins">
+    </sql>
+
+    <select id="get" resultType="CustomHiTaskinst">
+        SELECT
+        <include refid="customHiTaskinstColumns"/>
+        FROM custom_hi_taskinst a
+        <include refid="customHiTaskinstJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findList" resultType="CustomHiTaskinst">
+        SELECT
+        <include refid="customHiTaskinstColumns"/>
+        FROM custom_hi_taskinst a
+        <include refid="customHiTaskinstJoins"/>
+        <where>a.proc_inst_id = #{procInstId}
+            <if test="taskDefKey != null and taskDefKey != ''">
+                and a.task_def_key = #{taskDefKey}
+            </if>
+            <if test="assignee != null and assignee != ''">
+                and a.assignee = #{assignee}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and a.end_time = #{endTime}
+            </if>
+            order by a.start_time
+        </where>
+    </select>
+
+    <select id="findAllList" resultType="CustomHiTaskinst">
+        SELECT
+        DISTINCT
+        c.name as "name",
+        c.recall as "reason",
+        c.title as "comment",
+        c.dept_id as "taskDefKey",
+        a.proc_inst_id as "procInstId"
+        FROM custom_hi_taskinst a,custom_process c
+        <include refid="customHiTaskinstJoins"/>
+        <where> a.proc_inst_id = c.proc_inst_id
+            <if test="procInstId != null and procInstId != ''">
+                and   a.proc_inst_id = #{procInstId}
+            </if>
+            <if test="taskDefKey != null and taskDefKey != ''">
+                and a.task_def_key = #{taskDefKey}
+            </if>
+            <if test="assignee != null and assignee != ''">
+                and a.assignee = #{assignee}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and a.end_time = #{endTime}
+            </if>
+            order by a.start_time desc
+        </where>
+    </select>
+
+    <select id="findListByTable" resultType="CustomHiTaskinst">
+        SELECT DISTINCT
+        <include refid="customHiTaskinstColumns"/>,t.node_sort as "nodeSort"
+        FROM custom_hi_taskinst a,transfer_set t
+        <where>
+            a.proc_inst_id = t.proc_inst_id and t.node_name = a.`name` and a.task_def_key != 'start'
+            and a.task_def_key !='apply_end' and a.task_def_key not like 'apply_cs%'
+            AND a.`comment` IS NOT NULL
+            <if test="procInstId != null and procInstId != ''">
+                and a.proc_inst_id = #{procInstId}
+            </if>
+        </where>
+        order by t.node_sort
+    </select>
+
+    <insert id="insert">
+		INSERT INTO custom_hi_taskinst(
+			id,
+			proc_inst_id,
+			task_def_key,
+			start_time,
+			end_time,
+			assignee,
+			name,
+			reason,
+			comment
+		) VALUES (
+			#{id},
+			#{procInstId},
+			#{taskDefKey},
+			#{startTime},
+			#{endTime},
+			#{assignee},
+			#{name},
+			#{reason},
+			#{comment}
+		)
+	</insert>
+
+    <update id="update">
+		UPDATE custom_hi_taskinst SET 	
+			proc_inst_id = #{procInstId},
+			task_def_key = #{taskDefKey},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			assignee = #{assignee},
+			name = #{name},
+			reason = #{reason},
+			comment = #{comment}
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateComment">
+        UPDATE custom_hi_taskinst SET
+        comment = #{comment}
+        WHERE proc_inst_id = #{procInstId}
+    </update>
+
+    <update id="delete">
+		DELETE FROM custom_hi_taskinst
+		WHERE id = #{id}
+	</update>
+
+</mapper>

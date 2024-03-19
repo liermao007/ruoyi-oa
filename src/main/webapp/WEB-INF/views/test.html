@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table class="customers">
+  <tr>
+    <td class="right"> 组件版本号: </td>
+    <td class="left">
+      <input type="text" class="StandardWidth" id="id_xtx_version" readonly="readonly">
+    </td>
+  </tr>
+  <tr>
+    <td class="right"> 请选择证书: </td>
+    <td class="left">
+      <select class="StandardWidth" id="id_cert_list" onchange="select_cert(this.value)">
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="right"> 选择的证书ID: </td>
+    <td class="left">
+      <input type="text" class="StandardWidth" id="id_selected_cert_id">
+    </td>
+  </tr>
+  <tr>
+    <td class="right"> 请选择设备序列号: </td>
+    <td class="left">
+      <select class="StandardWidth" id="id_device_list" onchange="select_device(this.value)">
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td class="right"> 选择的设备序列号: </td>
+    <td class="left">
+      <input type="text" class="StandardWidth" id="id_selected_device_sn">
+    </td>
+  </tr>
+</table>
+<button type="button" onclick="getSignPic()">获取图片</button>
+<img id="img1" />
+</body>
+<script src="../../static/js/xtxsync.js"></script>
+<script src="../../static/jquery/jquery-1.9.1.min.js"></script>
+<script>
+  const certId = '', version = xtxsync.SOF_GetVersion
+
+  SetUserCertList("id_cert_list");
+
+  function getSignPic() {
+    var certId = $('#id_cert_list').val();
+    if (certId == "") {
+      return;
+    }
+    var i = certId.indexOf("/");
+    if (i > 0) {
+      certId = certId.substring(0, i)
+    }
+    let pic = xtxsync.GetPicture(certId);
+    showPicture(pic, "img1");
+  }
+
+  function showPicture(strImgData, imgId) {
+    if (strImgData == "") {
+      document.getElementById(imgId).src = "";
+      return;
+    }
+    var imgSrc="";
+    if (strImgData.substring(0, 4) == "R0lG") {
+      imgSrc = "data:image/gif;base64,";
+    } else if (strImgData.substring(0, 4) == "/9j/") {
+      imgSrc = "data:image/jpeg;base64,";
+    } else if (strImgData.substring(0, 4) == "iVBO") {
+      imgSrc = "data:image/png;base64,";
+    } else if (strImgData.substring(0, 4) == "SUkq") {
+      imgSrc = "data:image/tiff;base64,";
+    } else if (strImgData.substring(0, 2) == "Qk") {
+      imgSrc = "data:image/bmp;base64,";
+    } else {
+      imgSrc = "data:image/gif;base64,";
+    }
+    imgSrc += strImgData;
+    document.getElementById(imgId).src = imgSrc;
+  }
+</script>
+</html>

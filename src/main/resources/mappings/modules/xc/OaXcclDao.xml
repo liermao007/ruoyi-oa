@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.xc.dao.OaXcclDao">
+    
+	<sql id="oaXcclColumns">
+		a.id AS "id",
+		a.office_id AS "office.id",
+		a.table_id AS "tableId",
+		a.column_name AS "columnName",
+		a.record_id AS "recordId",
+		a.record_project AS "recordProject",
+		a.record_value AS "recordValue",
+		a.record_remark AS "recordRemark",
+		a.handle_opinion AS "handleOpinion",
+		a.handle_user_id AS "handleUserId",
+		a.handle_time AS "handleTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o2.name AS "office.name"
+	</sql>
+	
+	<sql id="oaXcclJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id
+	</sql>
+    
+	<select id="get" resultType="OaXccl">
+		SELECT 
+			<include refid="oaXcclColumns"/>
+		FROM oa_xccl a
+		<include refid="oaXcclJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OaXccl">
+		SELECT
+		a.id AS "id",
+		a.table_id AS "tableId",
+		a.column_name AS "columnName",
+		a.record_id AS "recordId",
+		a.record_project AS "recordProject",
+		a.record_value AS "recordValue",
+		a.record_remark AS "recordRemark",
+		a.handle_opinion AS "handleOpinion",
+		a.handle_user_id AS "handleUserId",
+		su.name AS "handleUsername",
+		a.handle_time AS "handleTime",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.XCR as "xcr",
+		b.TBKS as 'tbks',
+		b.XCRQ as 'xcrq'
+		FROM oa_xccl a
+		join t_xfaqxcb b on b.del_flag = #{DEL_FLAG_NORMAL} and a.record_id = b.id
+		join oa_person_define_table_column c on a.TABLE_ID = c.TABLE_ID and a.COLUMN_NAME = c.COLUMN_NAME
+		left join sys_user su on a.handle_user_id = su.id
+		where
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="xcr != null and xcr != ''">
+				and b.xcr like concat('%', #{xcr}, '%')
+			</if>
+			<if test="tbks != null and tbks != ''">
+				and b.TBKS = #{tbks}
+			</if>
+		order by b.xcrq, c.SORT
+	</select>
+	
+	<select id="findAllList" resultType="OaXccl">
+		SELECT 
+			<include refid="oaXcclColumns"/>
+		FROM oa_xccl a
+		<include refid="oaXcclJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<insert id="insert">
+		INSERT INTO oa_xccl(
+			id,
+			office_id,
+			table_id,
+			column_name,
+			record_id,
+			record_project,
+			record_value,
+			record_remark,
+			handle_opinion,
+			handle_user_id,
+			handle_time,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{tableId},
+			#{columnName},
+			#{recordId},
+			#{recordProject},
+			#{recordValue},
+			#{recordRemark},
+			#{handleOpinion},
+			#{handleUserId},
+			#{handleTime},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_xccl SET 	
+			office_id = #{office.id},
+			table_id = #{tableId},
+			column_name = #{columnName},
+			record_id = #{recordId},
+			record_value = #{recordValue},
+			record_remark = #{recordRemark},
+			handle_opinion = #{handleOpinion},
+			handle_user_id = #{handleUserId},
+			handle_time = #{handleTime},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE oa_xccl SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<select id="notReportDeptList" resultType="com.thinkgem.jeesite.modules.sys.entity.Office">
+		SELECT
+			a.NAME, a.CODE
+		FROM
+			sys_office a
+		WHERE a.DEL_FLAG = 0
+		  AND NOT EXISTS (SELECT 1 FROM T_XFAQXCB b WHERE a.name = b.TBKS AND b.XCRQ LIKE CONCAT(#{queryDate},'%'))
+		  AND a.GRADE = 2
+		ORDER BY a.CODE
+	</select>
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.process.dao.CustomCommentDao">
+    
+	<sql id="customCommentColumns">
+		a.id AS "id",
+		a.comment AS "comment",
+		a.proc_inst_id AS "procInstId",
+		a.del_flag AS "delFlag",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.user_id AS "userId"
+	</sql>
+	
+	<sql id="customCommentJoins">
+	</sql>
+    
+	<select id="get" resultType="CustomComment">
+		SELECT 
+			<include refid="customCommentColumns"/>
+		FROM custom_comment a
+		<include refid="customCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CustomComment">
+		SELECT 
+			<include refid="customCommentColumns"/>
+		FROM custom_comment a
+		<include refid="customCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CustomComment">
+		SELECT 
+			<include refid="customCommentColumns"/>
+		FROM custom_comment a
+		<include refid="customCommentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO custom_comment(
+			id,
+			comment,
+			proc_inst_id,
+			del_flag,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			user_id
+		) VALUES (
+			#{id},
+			#{comment},
+			#{procInstId},
+			#{delFlag},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{userId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE custom_comment SET 	
+			comment = #{comment},
+			proc_inst_id = #{procInstId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			user_id = #{userId}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE custom_comment SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

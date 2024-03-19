@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.table.dao.OaPersonDefineTableColumnDao">
+    
+	<sql id="oaPersonDefineTableColumnColumns">
+		a.id AS "id",
+		a.table_id AS "table.id",
+		a.column_name AS "columnName",
+		a.column_comment AS "columnComment",
+		a.column_type AS "columnType",
+		a.table_status AS "tableStatus",
+		a.is_required AS "isRequired",
+		a.is_show AS "isShow",
+		a.is_process AS "isProcess",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.control_type_id AS "controlTypeId",
+		a.is_audit AS "isAudit",
+		a.audit_post AS "auditPost",
+		a.sort AS "sort",
+		r.name AS "auditPostName"
+	</sql>
+
+    <sql id="oaPersonDefineTableColumnJoins">
+        LEFT JOIN oa_person_define_table b ON b.id = a.table_id
+        LEFT JOIN sys_role r ON r.id = a.audit_post
+        JOIN (select * from information_schema.`COLUMNS` where table_schema='jeesite' ) t ON t.column_name = upper(a.column_name) and t.table_name = upper(b.table_name)
+    </sql>
+	<select id="get" resultType="OaPersonDefineTableColumn">
+		SELECT 
+			<include refid="oaPersonDefineTableColumnColumns"/>
+		FROM oa_person_define_table_column a
+		<include refid="oaPersonDefineTableColumnJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="OaPersonDefineTableColumn">
+		SELECT 
+			<include refid="oaPersonDefineTableColumnColumns"/>
+		FROM oa_person_define_table_column a
+		<include refid="oaPersonDefineTableColumnJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="table.id != null and table.id != ''">
+				AND a.table_id = #{table.id}
+			</if>
+            <if test="isAudit != null and isAudit != ''">
+                AND a.is_audit = #{isAudit}
+            </if>
+            <if test="isShow != null and isShow != ''">
+                AND a.is_show = #{isShow}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort,a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="OaPersonDefineTableColumn">
+		SELECT 
+			<include refid="oaPersonDefineTableColumnColumns"/>
+		FROM oa_person_define_table_column a
+		<include refid="oaPersonDefineTableColumnJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort,a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oa_person_define_table_column(
+			id,
+			table_id,
+			column_name,
+			column_comment,
+			column_type,
+			table_status,
+			is_required,
+			is_show,
+			is_process,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			control_type_id,
+			is_audit,
+			sort,
+			audit_post
+		) VALUES (
+			#{id},
+			#{table.id},
+			#{columnName},
+			#{columnComment},
+			#{columnType},
+			#{tableStatus},
+			#{isRequired},
+			#{isShow},
+			#{isProcess},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{controlTypeId},
+			#{isAudit},
+			#{sort},
+			#{auditPost}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_person_define_table_column SET 	
+			table_id = #{table.id},
+			column_name = #{columnName},
+			column_comment = #{columnComment},
+			column_type = #{columnType},
+			table_status = #{tableStatus},
+			is_required = #{isRequired},
+			is_show = #{isShow},
+			is_process = #{isProcess},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			control_type_id = #{controlTypeId},
+			is_audit = #{isAudit},
+			sort = #{sort},
+			audit_post = #{auditPost}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+        delete from oa_person_define_table_column
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE table_id = #{table.id}
+			</otherwise>
+		</choose>
+	</delete>
+
+     <select id="findColumnListByTableId" resultType="OaPersonDefineTableColumn">
+        SELECT
+        <include refid="oaPersonDefineTableColumnColumns"/>
+        FROM oa_person_define_table_column a
+        <include refid="oaPersonDefineTableColumnJoins"/>
+        WHERE a.table_id = #{tableId}
+         and a.del_flag = '0'
+         order by a.sort
+    </select>
+
+    <select id="getMaxColumnIndex" resultType="String">
+        select max(column_name) from
+        (select to_number(substr(column_name,4)) column_name from oa_person_define_table_column where upper(column_name) like 'COL%' )
+    </select>
+
+    <select id="getColumns" resultType="OaPersonDefineTableColumn">
+          select COLUMN_NAME as columnName ,DATA_TYPE as columnType from information_schema.`COLUMNS` where TABLE_NAME=upper(#{tableName})
+    </select>
+</mapper>

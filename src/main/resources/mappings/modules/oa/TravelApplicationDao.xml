@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.TravelApplicationDao">
+    
+	<sql id="travelApplicationColumns">
+		a.id AS "id",
+		a.bh AS "bh",
+		a.ccdd AS "ccdd",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.proc_ins_id AS "procInsId",
+		a.proc_def_id AS "procDefId",
+		a.bzsj AS "bzsj",
+		a.fjlj AS "fjlj",
+		a.fjmc AS "fjmc",
+		a.ccts AS "ccts",
+		a.ccsy AS "ccsy",
+		a.syrs AS "syrs",
+		a.cf1 AS "cf1",
+		a.cf2 AS "cf2",
+		a.cf3 AS "cf3",
+		a.cf4 AS "cf4",
+		a.cf5 AS "cf5",
+		a.dd1 AS "dd1",
+		a.dd2 AS "dd2",
+		a.dd3 AS "dd3",
+		a.dd4 AS "dd4",
+		a.dd5 AS "dd5",
+		a.ccjssj AS "ccjssj",
+		a.jtgj1 AS "jtgj1",
+		a.jtgj2 AS "jtgj2",
+		a.jtgj3 AS "jtgj3",
+		a.jtgj4 AS "jtgj4",
+		a.jtgj5 AS "jtgj5",
+		a.xzbmyj AS "xzbmyj",
+		a.bmjlyj AS "bmjlyj",
+		a.ccr1 AS "ccr1",
+		a.ccrq AS "ccrq",
+		a.bm AS "bm",
+		a.sfcc AS "sfcc",
+		a.cckssj AS "cckssj",
+		a.sqr AS "sqr",
+		a.zjlsp AS "zjlsp"
+	</sql>
+	
+	<sql id="travelApplicationJoins">
+	</sql>
+    
+	<select id="get" resultType="TravelApplication">
+		SELECT 
+			<include refid="travelApplicationColumns"/>
+		FROM travel_application a
+		<include refid="travelApplicationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TravelApplication">
+		SELECT 
+			<include refid="travelApplicationColumns"/>
+		FROM travel_application a
+		<include refid="travelApplicationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="ccrq != null and ccrq != ''">
+				AND a.ccrq = #{ccrq}
+			</if>
+			<if test="bm != null and bm != ''">
+				AND a.bm = #{bm}
+			</if>
+			<if test="cckssj != null and cckssj != ''">
+				AND a.cckssj = #{cckssj}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TravelApplication">
+		SELECT 
+			<include refid="travelApplicationColumns"/>
+		FROM travel_application a
+		<include refid="travelApplicationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+    <select id="findPage" resultType="TravelApplication">
+        ${sql}
+    </select>
+	<insert id="insert">
+		INSERT INTO travel_application(
+			id,
+			bh,
+			ccdd,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			proc_ins_id,
+			proc_def_id,
+			bzsj,
+			fjlj,
+			fjmc,
+			ccts,
+			ccsy,
+			syrs,
+			cf1,
+			cf2,
+			cf3,
+			cf4,
+			cf5,
+			dd1,
+			dd2,
+			dd3,
+			dd4,
+			dd5,
+			ccjssj,
+			jtgj1,
+			jtgj2,
+			jtgj3,
+			jtgj4,
+			jtgj5,
+			xzbmyj,
+			bmjlyj,
+			ccr1,
+			ccrq,
+			bm,
+			sfcc,
+			cckssj,
+			sqr,
+			zjlsp
+		) VALUES (
+			#{id},
+			#{bh},
+			#{ccdd},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{procInsId},
+			#{procDefId},
+			#{bzsj},
+			#{fjlj},
+			#{fjmc},
+			#{ccts},
+			#{ccsy},
+			#{syrs},
+			#{cf1},
+			#{cf2},
+			#{cf3},
+			#{cf4},
+			#{cf5},
+			#{dd1},
+			#{dd2},
+			#{dd3},
+			#{dd4},
+			#{dd5},
+			#{ccjssj},
+			#{jtgj1},
+			#{jtgj2},
+			#{jtgj3},
+			#{jtgj4},
+			#{jtgj5},
+			#{xzbmyj},
+			#{bmjlyj},
+			#{ccr1},
+			#{ccrq},
+			#{bm},
+			#{sfcc},
+			#{cckssj},
+			#{sqr},
+			#{zjlsp}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE travel_application SET 	
+			bh = #{bh},
+			ccdd = #{ccdd},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			proc_ins_id = #{procInsId},
+			proc_def_id = #{procDefId},
+			bzsj = #{bzsj},
+			fjlj = #{fjlj},
+			fjmc = #{fjmc},
+			ccts = #{ccts},
+			ccsy = #{ccsy},
+			syrs = #{syrs},
+			cf1 = #{cf1},
+			cf2 = #{cf2},
+			cf3 = #{cf3},
+			cf4 = #{cf4},
+			cf5 = #{cf5},
+			dd1 = #{dd1},
+			dd2 = #{dd2},
+			dd3 = #{dd3},
+			dd4 = #{dd4},
+			dd5 = #{dd5},
+			ccjssj = #{ccjssj},
+			jtgj1 = #{jtgj1},
+			jtgj2 = #{jtgj2},
+			jtgj3 = #{jtgj3},
+			jtgj4 = #{jtgj4},
+			jtgj5 = #{jtgj5},
+			xzbmyj = #{xzbmyj},
+			bmjlyj = #{bmjlyj},
+			ccr1 = #{ccr1},
+			ccrq = #{ccrq},
+			bm = #{bm},
+			sfcc = #{sfcc},
+			cckssj = #{cckssj},
+			sqr = #{sqr},
+			zjlsp = #{zjlsp}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE travel_application SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

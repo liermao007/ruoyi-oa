@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OaSummaryPermissionDao">
+    
+	<sql id="oaSummaryPermissionColumns">
+		a.evaluate_id AS "evaluateId",
+		a.evaluate_by_id AS "evaluateById"
+	</sql>
+	
+	<sql id="oaSummaryPermissionJoins">
+	</sql>
+    
+	<select id="get" resultType="OaSummaryPermission">
+		SELECT
+			<include refid="oaSummaryPermissionColumns"/>
+		FROM oa_summary_permission a
+		<include refid="oaSummaryPermissionJoins"/>
+		WHERE  1=1
+        <if test="evaluateId !=null and evaluateId !=''">
+          and  a.evaluate_id = #{evaluateId}
+        </if>
+        <if test="evaluateById !=null and evaluateById !=''">
+            and  a.evaluate_by_id = #{evaluateById}
+        </if>
+
+	</select>
+
+
+    <select id="findById" resultType="OaSummaryPermission">
+        SELECT
+        <include refid="oaSummaryPermissionColumns"/>
+        FROM oa_summary_permission a
+        <include refid="oaSummaryPermissionJoins"/>
+        WHERE a.evaluate_by_id = #{evaluateById}
+    </select>
+	
+	<select id="findList" resultType="OaSummaryPermission">
+        SELECT
+        GROUP_CONCAT(p.`EVALUATE_ID` SEPARATOR ',')  AS "evaluateId",
+        GROUP_CONCAT(s.name SEPARATOR ',')  AS "evaluateName",
+        p.`EVALUATE_BY_ID` AS "evaluateById",
+        u.name AS "evaluateByNames"
+        FROM
+        oa_summary_permission p
+        LEFT JOIN sys_user u ON u.id=p.EVALUATE_BY_ID
+        LEFT JOIN sys_user s ON s.id=p.EVALUATE_ID
+        GROUP BY p.`EVALUATE_BY_ID`,u.`COMPANY_ID`
+        HAVING u.company_id = #{companyId}
+	</select>
+
+
+    <select id="findListByLoginId" resultType="OaSummaryPermission">
+        SELECT
+        p.`EVALUATE_BY_ID` AS "evaluateById",
+        p.`EVALUATE_ID` AS  "evaluateId",
+        e.name AS "evaluateName",
+        u.name AS "evaluateByNames",
+        o.name AS "officeName"
+        FROM oa_summary_permission p
+        LEFT JOIN sys_user e
+        ON e.id = p.EVALUATE_BY_ID
+        LEFT JOIN sys_user u
+        ON u.id = p.`EVALUATE_ID`
+        LEFT JOIN sys_office o
+        ON o.id =u.`OFFICE_ID`
+        <where>
+            <if test="loginId!=null and loginId!=''">
+                p.evaluate_by_id=#{loginId}
+            </if>
+        </where>
+    </select>
+
+
+
+	
+	<select id="findAllList" resultType="OaSummaryPermission">
+		SELECT 
+			<include refid="oaSummaryPermissionColumns"/>
+		FROM oa_summary_permission a
+		<include refid="oaSummaryPermissionJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oa_summary_permission(
+			evaluate_id,
+			evaluate_by_id
+		) VALUES (
+			#{evaluateId},
+			#{evaluateById}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_summary_permission SET 	
+			evaluate_id = #{evaluateId},
+			evaluate_by_id = #{evaluateById}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM oa_summary_permission
+		WHERE evaluate_by_id = #{evaluateById}
+	</update>
+	
+</mapper>

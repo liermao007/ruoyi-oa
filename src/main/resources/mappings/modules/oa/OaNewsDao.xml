@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.OaNewsDao">
+    
+	<sql id="oaNewsColumns">
+		a.id AS "id",
+		a.title AS "title",
+		a.content AS "content",
+		a.files AS "files",
+		a.audit_flag AS "auditFlag",
+		a.audit_man AS "auditMan",
+		a.is_topic AS "isTopic",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.COMPANYID AS "companyId",
+		a.files_name AS "filesName",
+		a.fjlj AS "fjlj"
+	</sql>
+	
+	<sql id="oaNewsJoins">
+	</sql>
+    
+	<select id="get" resultType="OaNews">
+		SELECT 
+			<include refid="oaNewsColumns"/>
+		FROM oa_news a
+		<include refid="oaNewsJoins"/>
+		WHERE a.id = #{id}
+       and a.del_flag='0'
+	</select>
+
+
+
+    <select id="findCollectList" resultType="OaNews">
+        SELECT
+        <include refid="oaNewsColumns"/>
+        ,u1.name createManName,u2.name auditManName
+        FROM oa_news a,sys_user u1,sys_user u2
+        <include refid="oaNewsJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            and u1.del_flag = #{DEL_FLAG_NORMAL}
+            and u1.del_flag = #{DEL_FLAG_NORMAL}
+            and u1.id = a.create_by
+            and u2.id = a.audit_man
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND a.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND a.audit_man = #{auditMan}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.is_topic desc,a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+	
+    <select id="findList" resultType="OaNews">
+        SELECT
+        <include refid="oaNewsColumns"/>,
+        (SELECT COUNT(*) FROM oa_news ons
+        <!--<if test="isSelf">-->
+            <!--JOIN oa_news_record r ON r.oa_news_id = ons.id AND r.user_id = #{userId}-->
+        <!--</if>-->
+        <if test="userId != null and userId != '' ">
+            JOIN oa_news_record r ON r.oa_news_id = ons.id AND r.user_id  IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{userId} and del_flag='0' ))
+        </if>
+        JOIN oa_audit_man m ON m.AUDIT_ID= ons.AUDIT_MAN
+        JOIN sys_user u ON u.id= ons.CREATE_BY
+        WHERE ons.del_flag = #{DEL_FLAG_NORMAL}
+        <!--<if test="companyId != null and companyId != ''">
+            AND  ons.COMPANYID = #{companyId}
+        </if>-->
+        <if test="title != null and title != ''">
+            AND ons.title LIKE
+            <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+            <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+        </if>
+        <if test="auditFlag != null and auditFlag != ''">
+            AND ons.audit_flag = #{auditFlag}
+        </if>
+        <if test="auditMan != null and auditMan != ''">
+            AND ons.audit_man = #{auditMan}
+        </if>
+        <if test="updateDate != null and updateDate != ''"><!--岗位工作平台调用接口数据使用 -->
+            AND  ons.update_Date >= #{updateDate}
+        </if>
+        ) AS "count"
+        <if test="isSelf">,
+            r.read_flag
+        </if>,
+        m.audit_man as auditManName,
+        u.photo AS photo,
+        u.name as createManName
+        FROM oa_news a
+        <include refid="oaNewsJoins"/>
+
+        <!-- &lt;!&ndash; 我的通知 &ndash;&gt;-->
+        <if test="isSelf">
+          JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{currentUser.id} and del_flag='0' ))
+
+        </if>
+
+        <if test="userId != null and userId != '' "><!--岗位工作平台调用接口数据使用 -->
+            left  JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id = #{userId}
+        </if>
+        left  JOIN oa_audit_man m ON m.AUDIT_ID= a.AUDIT_MAN
+        <if test="companyId != null and companyId != ''"><!--由于新闻审核官中可能一个人存在多个机构中，所以需要标识，取出一个即可-->
+            AND  m.company_id= #{companyId}
+        </if>
+        left  JOIN sys_user u ON u.id= a.CREATE_BY
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+
+           <!-- <if test="companyId != null and companyId != ''">
+                AND  a.COMPANYID = #{companyId}
+            </if>-->
+
+			<if test="title != null and title != ''">
+				AND a.title LIKE
+					<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+			</if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND a.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND a.audit_man = #{auditMan}
+            </if>
+            <if test="updateDate != null and updateDate != ''"><!--岗位工作平台调用接口数据使用 -->
+                AND  a.update_Date >= #{updateDate}
+            </if>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY
+                <if test="isSelf">
+                   r.read_flag asc,
+                </if>
+                a.is_topic desc,a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--岗位工作平台使用的接口数据-->
+    <select id="findListByWork" resultType="OaNews">
+        SELECT
+        <include refid="oaNewsColumns"/>
+
+        <if test="isSelf">,
+            r.read_flag
+        </if>
+        FROM oa_news a
+        <include refid="oaNewsJoins"/>
+
+        <!-- &lt;!&ndash; 我的通知 &ndash;&gt;-->
+        <if test="isSelf">
+            JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{currentUser.id} and del_flag='0' ))
+        </if>
+
+        <if test="userId != null and userId != '' "><!--岗位工作平台调用接口数据使用 -->
+            JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id  IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{userId} and del_flag='0' ))
+        </if>
+
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+
+            <if test="companyId != null and companyId != ''">
+                AND  a.COMPANYID = #{companyId}
+            </if>
+
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND a.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND a.audit_man = #{auditMan}
+            </if>
+            <if test="updateDate != null and updateDate != ''"><!--岗位工作平台调用接口数据使用 -->
+                AND  a.update_Date >= #{updateDate}
+            </if>
+            <if test="readFlag != null and readFlag != ''"><!--岗位工作平台调用接口数据使用 -->
+                AND  r.read_flag =#{readFlag}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.is_topic desc,a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <!--新闻公告查询近15天-->
+    <select id="findListAndRole" resultType="OaNews">
+        SELECT
+        <include refid="oaNewsColumns"/>
+
+        <if test="isSelf">,
+            r.read_flag
+        </if>,
+        m.audit_man as auditManName,
+        u.name as createManName
+        FROM oa_news a
+        <include refid="oaNewsJoins"/>
+
+        <!-- &lt;!&ndash; 我的通知 &ndash;&gt;-->
+        <if test="isSelf">
+            JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{currentUser.id} and del_flag='0' ))
+        </if>
+
+        <if test="userId != null and userId != '' "><!--岗位工作平台调用接口数据使用 -->
+            JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{userId} and del_flag='0' ))
+        </if>
+        LEFT  JOIN oa_audit_man m ON m.AUDIT_ID= a.AUDIT_MAN
+        LEFT JOIN sys_user u ON u.id= a.CREATE_BY
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+
+            <if test="companyId != null and companyId != ''">
+                AND  a.COMPANYID = #{companyId}
+            </if>
+
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND a.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND a.audit_man = #{auditMan}
+            </if>
+            <if test="updateDate != null and updateDate != ''"><!--岗位工作平台调用接口数据使用 -->
+                AND  a.update_Date >= #{updateDate}
+            </if>
+            AND
+            DATE_FORMAT(a.create_date , '%y/%m/%d') > DATE_FORMAT(
+            DATE_SUB(CURDATE(), INTERVAL 15 DAY),
+            '%y/%m/%d'
+            )
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.is_topic desc,a.create_date DESC
+            </otherwise>
+        </choose>
+
+    </select>
+
+    <!--更新超过七天的置顶的新闻公告-->
+    <update id="updateTopic">
+         update oa_news set
+         is_topic = #{isTopic}
+        <where>
+            del_flag = #{DEL_FLAG_NORMAL}
+            AND DATE_SUB(CURDATE(), INTERVAL 7 DAY) > DATE(create_date);
+        </where>
+    </update>
+
+
+    <!--查询当前登陆人所有的新闻，同时查询发布人和发布人所属的角色-->
+
+    <!--以前的新闻公告审核（查出俩条的）-->
+    <!--<select id="findListAndRole" resultType="OaNews">-->
+        <!--SELECT-->
+        <!--a.id, a.create_date,a.title,a.content,a.create_by,s.name AS 'createManName',sr.name AS 'auditManName'-->
+        <!--<if test="isSelf">,-->
+            <!--r.read_flag-->
+        <!--</if>-->
+        <!--FROM sys_user s,sys_user_role ur ,sys_role sr , oa_news a-->
+        <!--<include refid="oaNewsJoins"/>-->
+
+        <!--&lt;!&ndash; &lt;!&ndash; 我的通知 &ndash;&gt;&ndash;&gt;-->
+        <!--<if test="isSelf">-->
+            <!--JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id = #{currentUser.id}-->
+        <!--</if>-->
+
+        <!--<if test="userId != null and userId != '' ">&lt;!&ndash;岗位工作平台调用接口数据使用 &ndash;&gt;-->
+            <!--JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id = #{userId}-->
+        <!--</if>-->
+
+        <!--<where>-->
+            <!--a.del_flag = #{DEL_FLAG_NORMAL} and  a.create_by = s.id and s.id = ur.user_id and sr.id = ur.role_id-->
+
+            <!--<if test="companyId != null and companyId != ''">-->
+                <!--AND  a.COMPANYID = #{companyId}-->
+            <!--</if>-->
+
+            <!--<if test="title != null and title != ''">-->
+                <!--AND a.title LIKE-->
+                <!--<if test="dbName == 'oracle'">'%'||#{title}||'%'</if>-->
+                <!--<if test="dbName == 'mssql'">'%'+#{title}+'%'</if>-->
+                <!--<if test="dbName == 'mysql'">concat('%',#{title},'%')</if>-->
+            <!--</if>-->
+            <!--<if test="auditFlag != null and auditFlag != ''">-->
+                <!--AND a.audit_flag = #{auditFlag}-->
+            <!--</if>-->
+            <!--<if test="auditMan != null and auditMan != ''">-->
+                <!--AND a.audit_man = #{auditMan}-->
+            <!--</if>-->
+            <!--<if test="updateDate != null and updateDate != ''">&lt;!&ndash;岗位工作平台调用接口数据使用 &ndash;&gt;-->
+                <!--AND  a.update_Date >= #{updateDate}-->
+            <!--</if>-->
+        <!--</where>-->
+        <!--<choose>-->
+            <!--<when test="page !=null and page.orderBy != null and page.orderBy != ''">-->
+                <!--ORDER BY ${page.orderBy}-->
+            <!--</when>-->
+            <!--<otherwise>-->
+                <!--ORDER BY a.is_topic desc,a.create_date DESC-->
+            <!--</otherwise>-->
+        <!--</choose>-->
+    <!--</select>-->
+
+
+    <select id="findMyWriteNews" resultType="OaNews">
+        SELECT
+        <include refid="oaNewsColumns"/>,
+        (SELECT COUNT(*) FROM oa_news ons
+        <if test="isSelf">
+            JOIN oa_news_record r ON r.oa_news_id = ons.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{currentUser.id} and del_flag='0' ))
+        </if>
+        left  JOIN sys_user m ON m.id= ons.AUDIT_MAN
+        left  JOIN sys_user u ON u.id= ons.CREATE_BY
+        <where>
+            ons.del_flag = #{DEL_FLAG_NORMAL} and ons.create_by
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{createBy.id} and del_flag='0' ))
+            <if test="companyId != null and companyId != ''">
+                AND  ons.COMPANYID = #{companyId}
+            </if>
+
+            <if test="title != null and title != ''">
+                AND ons.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND ons.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND ons.audit_man = #{auditMan}
+            </if>
+        </where>
+        ) AS "count"
+        <if test="isSelf">,
+            r.read_flag
+        </if>,
+        m.name as auditManName,
+        u.name as createManName
+        FROM oa_news a
+        <include refid="oaNewsJoins"/>
+
+        <!-- &lt;!&ndash; 我的通知 &ndash;&gt;-->
+        <if test="isSelf">
+            JOIN oa_news_record r ON r.oa_news_id = a.id AND r.user_id
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{currentUser.id} and del_flag='0' ))
+        </if>
+
+       left  JOIN sys_user m ON m.id= a.AUDIT_MAN
+        left  JOIN sys_user u ON u.id= a.CREATE_BY
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL} and a.create_by
+            IN (SELECT id FROM sys_user WHERE del_flag = 0
+            and  login_name = (SELECT login_name FROM sys_user WHERE id =#{createBy.id} and del_flag='0' ))
+            <if test="companyId != null and companyId != ''">
+                AND  a.COMPANYID = #{companyId}
+            </if>
+
+
+            <if test="title != null and title != ''">
+                AND a.title LIKE
+                <if test="dbName == 'oracle'">'%'||#{title}||'%'</if>
+                <if test="dbName == 'mssql'">'%'+#{title}+'%'</if>
+                <if test="dbName == 'mysql'">concat('%',#{title},'%')</if>
+            </if>
+            <if test="auditFlag != null and auditFlag != ''">
+                AND a.audit_flag = #{auditFlag}
+            </if>
+            <if test="auditMan != null and auditMan != ''">
+                AND a.audit_man = #{auditMan}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.is_topic desc,a.create_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+	
+	<select id="findAllList" resultType="OaNews">
+		SELECT 
+			<include refid="oaNewsColumns"/>
+		FROM oa_news a
+		<include refid="oaNewsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO oa_news(
+			id,
+			title,
+			content,
+			files,
+			audit_flag,
+			audit_man,
+			is_topic,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			COMPANYID,
+			files_name,
+			fjlj
+		) VALUES (
+			#{id},
+			#{title},
+			#{content},
+			#{files},
+			#{auditFlag},
+			#{auditMan},
+			#{isTopic},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{companyId},
+			#{filesName},
+			#{fjlj}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE oa_news SET 	
+			title = #{title},
+			content = #{content},
+			files = #{files},
+			audit_flag = #{auditFlag},
+			audit_man = #{auditMan},
+			is_topic = #{isTopic},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			files_name = #{filesName},
+			fjlj = #{fjlj}
+		WHERE id = #{id}
+	</update>
+
+
+    <update id="updateReadflag">
+        UPDATE oa_news_record SET
+        readflag = "1"
+        where oa_news_id = #{id} and user_id = #{userId}
+    </update>
+	
+	<update id="delete">
+		UPDATE oa_news SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+</mapper>

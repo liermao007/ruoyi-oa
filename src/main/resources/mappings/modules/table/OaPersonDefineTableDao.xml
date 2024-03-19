@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.table.dao.OaPersonDefineTableDao">
+
+	<sql id="oaPersonDefineTableColumns">
+		a.id AS "id",
+		a.office_id AS "office.id",
+		a.table_name AS "tableName",
+		a.table_comment AS "tableComment",
+		a.table_property AS "tableProperty",
+		a.table_status AS "tableStatus",
+		a.is_master AS "isMaster",
+		a.is_detail AS "isDetail",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		o2.name AS "office.name"
+	</sql>
+
+	<sql id="oaPersonDefineTableJoins">
+		LEFT JOIN sys_office o2 ON o2.id = a.office_id
+		JOIN (select table_name from information_schema.tables where table_schema='jeesite') t ON t.table_name = upper(a.table_name)
+	</sql>
+
+	<select id="get" resultType="OaPersonDefineTable">
+		SELECT
+			<include refid="oaPersonDefineTableColumns"/>
+		FROM oa_person_define_table a
+		<include refid="oaPersonDefineTableJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="OaPersonDefineTable">
+		SELECT
+			<include refid="oaPersonDefineTableColumns"/>
+		FROM oa_person_define_table a
+		<include refid="oaPersonDefineTableJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="tableName != null and tableName != ''">
+				AND a.table_name = #{tableName}
+			</if>
+            <if test="office != null and office.id != null and office.id != ''">
+                AND a.office_id = #{office.id}
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+    <!--&lt;!&ndash;查询最近五条&ndash;&gt;
+    <select id="oaHasToDoTasks"  resultType="Act">
+        SELECT
+        DISTINCT
+        h.`PROC_INST_ID_`as taskId ,
+        m.`table_name` as taskDefKey,
+        m.`ALIAS` as taskName,
+        s.`NAME` AS 'comment',
+        date_format(h.START_TIME_, '%Y-%m-%d') as startTime ,
+        u.name        as CS
+        FROM
+        act_hi_taskinst h
+        LEFT JOIN oa_form_master m ON m.form_no =LEFT(h.PROC_DEF_ID_, LOCATE(':',h.PROC_DEF_ID_)-1)
+        LEFT JOIN act_hi_identitylink a ON a.proc_inst_id_=h.`PROC_INST_ID_` AND a.type_="starter" &lt;!&ndash; 固定的&ndash;&gt;
+        LEFT JOIN sys_user u ON u.login_name=a.`USER_ID_`
+        LEFT JOIN  act_ru_task t ON t.proc_inst_id_ =h.`PROC_INST_ID_`
+        LEFT JOIN sys_user s ON t.`ASSIGNEE_` =s.`LOGIN_NAME`
+        WHERE h.ASSIGNEE_ =#{loginName} &lt;!&ndash; ${} 赋值标签 可以将实体类中的参数对象名称直接写在括号里边 必须得一直 可以赋值 tangzm&ndash;&gt;
+        ORDER BY h.end_time_ DESC
+        LIMIT   ${no}
+    </select>
+-->
+    <select id="findListByLoginName" resultType="OaPersonDefineTable">
+      SELECT
+	p.name_ AS tableComment,
+	max(h.PROC_DEF_ID_) AS id
+FROM
+	act_re_model p
+LEFT JOIN act_hi_taskinst h ON SUBSTRING_INDEX(h.PROC_DEF_ID_, ':', 1) = p.key_
+WHERE
+	p.key_ IN (
+		SELECT
+			SUBSTRING_INDEX(PROC_DEF_ID_, ':', 1)
+		FROM
+			`act_hi_taskinst` h
+		WHERE
+			h.ASSIGNEE_ = #{loginName}
+		GROUP BY
+			h.PROC_DEF_ID_
+	)
+GROUP BY
+	p.key_
+    </select>
+
+	<select id="findListByInstId" resultType="OaPersonDefineTable">
+		SELECT
+		p.name_ AS tableComment,
+		h.PROC_DEF_ID_ AS id
+		FROM
+		act_re_model p
+		LEFT JOIN act_hi_taskinst h ON SUBSTRING_INDEX(h.PROC_DEF_ID_, ':', 1) = p.key_
+		WHERE
+		p.key_ IN (
+		SELECT
+		SUBSTRING_INDEX(PROC_DEF_ID_, ':', 1)
+		FROM
+		`act_hi_taskinst` h
+		WHERE
+		h.PROC_INST_ID_ = #{instId}
+		GROUP BY
+		h.PROC_DEF_ID_
+		)
+		GROUP BY
+		p.key_
+	</select>
+
+	<select id="findListByLoginId" resultType="OaRunProcess">
+		SELECT
+		principal AS principal,
+		principalid AS principalid
+		FROM
+		oa_run_process
+		WHERE
+		agentid = #{loginId} and BY_FLAG = '0'
+	</select>
+
+	<select id="findAllList" resultType="OaPersonDefineTable">
+		SELECT
+			<include refid="oaPersonDefineTableColumns"/>
+		FROM oa_person_define_table a
+		<include refid="oaPersonDefineTableJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO oa_person_define_table(
+			id,
+			office_id,
+			table_name,
+			table_comment,
+			table_property,
+			table_status,
+			is_master,
+			is_detail,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{tableName},
+			#{tableComment},
+			#{tableProperty},
+			#{tableStatus},
+			#{isMaster},
+			#{isDetail},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE oa_person_define_table SET
+			office_id = #{office.id},
+			table_name = #{tableName},
+			table_comment = #{tableComment},
+			table_property = #{tableProperty},
+			table_status = #{tableStatus},
+			is_master = #{isMaster},
+			is_detail = #{isDetail},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM oa_person_define_table
+		WHERE id = #{id}
+	</delete>
+
+    <select id="findByTableName" resultType="OaPersonDefineTable">
+        SELECT
+        <include refid="oaPersonDefineTableColumns"/>
+        FROM oa_person_define_table a
+        <include refid="oaPersonDefineTableJoins"/>
+        WHERE a.del_flag = '0' and a.table_Name = #{tableName}
+        <if test="officeId != null and officeId != ''">
+            AND a.office_id = #{officeId}
+        </if>
+    </select>
+
+
+
+    <update id="executeSql">
+        ${sql}
+    </update>
+
+
+
+    <select id="getByProcInsId" resultType="java.util.Map">
+        ${sql}
+    </select>
+
+    <select id="getActReModel" resultType="java.util.Map">
+        ${sql}
+    </select>
+
+    <select id="getMax" resultType="java.lang.String">
+        ${sql}
+    </select>
+
+    <select id="getFlowInfo" resultType="java.util.Map">
+        ${sql}
+    </select>
+    <select id="getFlowInfo1" resultType="java.util.Map">
+        ${sql}
+    </select>
+</mapper>

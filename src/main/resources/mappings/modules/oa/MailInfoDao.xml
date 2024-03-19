@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.MailInfoDao">
+    
+	<sql id="mailInfoColumns">
+		a.id AS "id",
+		a.theme AS "theme",
+		a.content AS "content",
+		a.files AS "files",
+		a.read_mark AS "readMark",
+		a.time AS "time",
+		a.sender_id AS "senderId",
+		a.receiver_id AS "receiverId",
+		a.cc_id AS "ccId",
+		a.own_id AS "ownId",
+		a.state AS "state",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.flag AS "flag",
+		a.all_receiver as "allReceiver",
+		a.out_side as "outSide",
+		a.all_id as "allId",
+		a.files_name as "filesName",
+		a.fjlj as "fjlj"
+	</sql>
+	
+	<sql id="mailInfoJoins">
+	</sql>
+
+	<select id="get" resultType="MailInfo">
+		SELECT 
+			<include refid="mailInfoColumns"/>
+		FROM mail_info a
+		<include refid="mailInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+    <select id="getMail" resultType="MailInfo">
+        SELECT
+        a.*,s.name
+        FROM mail_info a,sys_user s
+        WHERE a.id = #{id}
+              and s.id=a.sender_id
+    </select>
+
+    <select id="getPhone" resultType="User">
+        SELECT
+        s.*,o.name as officeName
+        FROM sys_user s,sys_office o
+        where  s.office_id=o.id
+        <if test="companyId !=null and companyId !=''">
+           and s.company_id  like
+            <if test="dbName == 'mysql'">CONCAT('%', #{companyId}, '%')</if>
+        </if>
+        <if test="loginName != null and loginName != ''">
+            AND s.login_name like
+            <if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+            <if test="dbName == 'mysql'">CONCAT('%', #{loginName}, '%')</if>
+        </if>
+        <if test="name != null and name != ''">
+            AND s.name like
+            <if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+            <if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+            <if test="dbName == 'mysql'">CONCAT('%', #{name}, '%')</if>
+        </if>
+        and  s.del_flag='0'
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY s.office_id, s.no,  s.company_id
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getById" resultType="User">
+        SELECT
+        *
+        FROM sys_user s
+        where s.id=#{id}
+    </select>
+
+
+
+
+
+    <select id="findList" resultType="MailInfo">
+        SELECT
+        <include refid="mailInfoColumns"/> ,
+        (SELECT COUNT(*) FROM mail_info mi
+        WHERE mi.del_flag = #{DEL_FLAG_NORMAL}
+        <if test="ownId!=null and ownId!=''">
+            and mi.own_id IN (SELECT  id  FROM sys_user WHERE login_name =  (SELECT login_name FROM sys_user WHERE id =#{ownId} ))
+        </if>
+        <if test="state!=null and state!=''">
+            and mi.state = #{state}
+        </if>
+        <if test="readMark!=null and readMark!=''">
+            and mi.read_mark = #{readMark}
+        </if>
+        <if test="flag!=null and flag!=''">
+            and mi.flag=#{flag}
+        </if>
+        ) AS "count",
+        s.name as 'name'
+        FROM mail_info a,sys_user  s
+        <include refid="mailInfoJoins"/>
+        <where>
+            a.del_flag = #{DEL_FLAG_NORMAL}
+            and a.sender_id=s.id
+            <if test="ownId!=null and ownId!=''">
+                and a.own_id IN (SELECT id FROM sys_user WHERE del_flag = 0
+                and  login_name = (SELECT login_name FROM sys_user WHERE id =#{ownId} and del_flag='0' ))
+            </if>
+            <if test="state!=null and state!=''">
+                and a.state = #{state}
+            </if>
+            <if test="readMark!=null and readMark!=''">
+                and a.read_mark = #{readMark}
+            </if>
+            <if test="flag!=null and flag!=''">
+                and a.flag=#{flag}
+            </if>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.READ_MARK,a.time DESC
+            </otherwise>
+        </choose>
+    </select>
+	
+	<!--<select id="findList1" resultType="MailInfo">-->
+		<!--SELECT-->
+			<!--<include refid="mailInfoColumns"/> ,s.name ,  s1.name as receiverNames-->
+		<!--FROM mail_info a,sys_user  s,sys_user s1-->
+		<!--<include refid="mailInfoJoins"/>-->
+		<!--<where>-->
+			<!--a.del_flag = #{DEL_FLAG_NORMAL}-->
+            <!--and a.sender_id=s.id-->
+            <!--and a.receiver_id=s1.id-->
+            <!--<if test="ownId!=null and ownId!=''">-->
+                <!--and a.own_id = #{ownId}-->
+            <!--</if>-->
+            <!--<if test="state!=null and state!=''">-->
+                <!--and a.state = #{state}-->
+            <!--</if>-->
+            <!--<if test="readMark!=null and readMark!=''">-->
+                <!--and a.read_mark = #{readMark}-->
+            <!--</if>-->
+            <!--<if test="flag!=null and flag!=''">-->
+                <!--and a.flag=#{flag}-->
+            <!--</if>-->
+
+		<!--</where>-->
+		<!--<choose>-->
+			<!--<when test="page !=null and page.orderBy != null and page.orderBy != ''">-->
+				<!--ORDER BY ${page.orderBy}-->
+			<!--</when>-->
+			<!--<otherwise>-->
+				<!--ORDER BY a.time DESC-->
+			<!--</otherwise>-->
+		<!--</choose>-->
+	<!--</select>-->
+	
+	<select id="findAllList" resultType="MailInfo">
+		SELECT 
+			<include refid="mailInfoColumns"/>
+		FROM mail_info a
+		<include refid="mailInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO mail_info(
+			id,
+			theme,
+			content,
+			files,
+			read_mark,
+			time,
+			sender_id,
+			receiver_id,
+			cc_id,
+			own_id,
+			state,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			flag,
+			all_receiver,
+			out_side,
+			all_id,
+			files_name,
+			fjlj
+		) VALUES (
+			#{id},
+			#{theme},
+			#{content},
+			#{files},
+			#{readMark},
+			#{time},
+			#{senderId},
+			#{receiverId},
+			#{ccId},
+			#{ownId},
+			#{state},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{flag},
+			#{allReceiver},
+			#{outSide},
+			#{allId},
+			#{filesName},
+			#{fjlj}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE mail_info SET 	
+			theme = #{theme},
+			content = #{content},
+			files = #{files},
+			read_mark = #{readMark},
+			time = #{time},
+			sender_id = #{senderId},
+			receiver_id = #{receiverId},
+			cc_id = #{ccId},
+			own_id = #{ownId},
+			state = #{state},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			flag=#{flag},
+			all_receiver=#{allReceiver},
+			out_side=#{outSide},
+			all_id=#{allId}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from  mail_info
+		WHERE id = #{id}
+	</delete>
+
+    <update id="allRead">
+        UPDATE mail_info SET
+        read_mark = '1'
+        WHERE own_id = #{userId}
+    </update>
+	
+</mapper>

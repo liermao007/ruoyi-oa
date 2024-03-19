@@ -1,0 +1,1964 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components>
+    <!--text-->
+    <component>
+        <value>textValue</value>
+        <type>controlType</type>
+        <name>textValue</name>
+        <content><![CDATA[
+            ${colValue}
+        ]]></content>
+    </component>
+    <!--标准输入-->
+    <component>
+        <value>text</value>
+        <type>controlType</type>
+        <name>标准输入</name>
+        <content><![CDATA[
+            <input name="${colName}" type="text" value="${colValue}"/>
+        ]]></content>
+    </component>
+    <!--文本输入-->
+    <component>
+        <value>textarea</value>
+        <type>controlType</type>
+        <name>文本输入</name>
+        <content><![CDATA[
+                <textarea name="${colName}" rows="3"/>${colValue}</textarea>
+            ]]></content>
+    </component>
+    <!--数字输入-->
+    <component>
+        <value>numeric</value>
+        <type>controlType</type>
+        <name>数字输入</name>
+        <content><![CDATA[
+            <input name="${colName}" type="text" value="${colValue}"/>
+        ]]></content>
+    </component>
+    <!--日期输入-->
+    <component>
+        <value>date</value>
+        <type>controlType</type>
+        <name>日期输入</name>
+        <content><![CDATA[
+            <input name="${colName}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+					value="${colValue}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"  onchange="aaa(this);"/>
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.common.utils.DateUtils.getDate</initMethod>
+    </component>
+    <!--空日期输入-->
+    <component>
+        <value>date1</value>
+        <type>controlType</type>
+        <name>空日期输入</name>
+        <content><![CDATA[
+            <input name="${colName}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+					value="${colValue}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});" onchange="aaa(this)";/>
+        ]]></content>
+    </component>
+    <!--时间输入-->
+    <component>
+        <value>datetime</value>
+        <type>controlType</type>
+        <name>时间输入</name>
+        <content><![CDATA[
+            <input name="${colName}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+					value="${colValue}" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+        ]]></content>
+    </component>
+    <!--多人员选择-->
+    <component>
+        <value>selectUsers</value>
+        <type>controlType</type>
+
+        <name>多人员选择</name>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUsername</initMethod>;
+        <content><![CDATA[
+            <div class="input-append">
+                <input id="${colName}" name="${colName}" readonly="readonly" type="text" value="${colValue}"/>
+                <a id="${colName}Button" href="javascript:" class="btn" style="margin-left:-5px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+            <div>
+         <script>
+            $("#${colName}Button, #${colName}").click(function(){
+		// 是否限制选择，如果限制，设置为disabled
+		if ($("#${colName}Button").hasClass("disabled")){
+			return true;
+		}
+		// 正常打开
+		top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3")+"&checked=true", "选择人员", 300, 420, {
+			ajaxData:{selectIds: $("#${colName}").val()},buttons:{"确定":"ok","清除":"clear","关闭":true}, submit:function(v, h, f){
+				if (v=="ok"){
+					var tree = h.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+					var  names = [], nodes = [];
+					if ("true" == "true"){
+						nodes = tree.getCheckedNodes(true);
+					}else{
+						nodes = tree.getSelectedNodes();
+					}
+					for(var i=0; i<nodes.length; i++) {//<c:if test="true">
+						if (nodes[i].isParent){
+							continue; // 如果为复选框选择，则过滤掉父节点
+						}//</c:if><c:if test="true">
+						if (nodes[i].level == 0){
+							top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+							return false;
+						}//</c:if>
+						if (nodes[i].isParent){
+							top.$.jBox.tip("不能选择父节点（"+nodes[i].name+"）请重新选择。");
+							return false;
+						}
+						names.push(nodes[i].name);
+											}
+	                  var currentname=document.getElementById("${colName}").value;
+	                  names.push(currentname);
+					$("#${colName}").val(names.join(","));
+				}
+				else if (v=="clear"){
+					$("#${colName}").val("");
+                }
+				if(typeof  ${colName}TreeselectCallBack == 'function'){
+					 ${colName}TreeselectCallBack(v, h, f);
+				}
+			}, loaded:function(h){
+				$(".jbox-content", top.document).css("overflow-y","hidden");
+			}
+		});
+	});
+
+       </script>
+
+        ]]></content>
+
+
+    </component>
+    <!--人员选择-->
+    <component>
+        <value>selectUser</value>
+        <type>controlType</type>
+        <name>人员选择</name>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUsername</initMethod>;
+        <content><![CDATA[
+            <div class="input-append">
+                <input id="${colName}" name="${colName}" readonly="readonly" type="text" value="${colValue}"  />
+                <a id="${colName}Button" href="javascript:" class="btn" style="margin-left:-5px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+            <div>
+            <script type="text/javascript">
+                $("#${colName}Button, #${colName}").click(function(){
+                    // 是否限制选择，如果限制，设置为disabled
+                 //   if ($("#${colName}Button").hasClass("disabled")){
+                  //      return true;
+                  //  }
+                    // 正常打开
+                    top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3"), "选择人员", 300, 420, {
+                        ajaxData:{selectIds: $("#${colName}").val()},buttons:{"确定":"ok", "清除":"clear","关闭":true}, submit:function(v, h, f){
+                            if (v=="ok"){
+                                var tree = h.find("iframe")[0].contentWindow.tree;
+                                var names = [], nodes = [];
+                                nodes = tree.getSelectedNodes(true);
+                                for(var i=0; i<nodes.length; i++) {
+                                    if (nodes[i].level == 0){
+                                        top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+                                        return false;
+                                    }
+                                    if (nodes[i].isParent){
+                                        top.$.jBox.tip("不能选择父节点（"+nodes[i].name+"）请重新选择。");
+                                        return false;
+                                    }
+                                    $("#${colName}").val(nodes[i].name);
+                                    break;
+                                }
+
+                            }
+                            else if (v=="clear"){
+                                $("#${colName}").val("");
+                            }
+                            if(typeof ${colName}TreeselectCallBack == 'function'){
+                                ${colName}TreeselectCallBack(v, h, f);
+                            }
+                        }, loaded:function(h){
+                            $(".jbox-content", top.document).css("overflow-y","hidden");
+                        }
+                    });
+                });
+            </script>
+        ]]></content>
+    </component>
+    <!--科室选择-->
+    <component>
+        <value>selectOffice</value>
+        <type>controlType</type>
+        <name>科室选择</name>
+        <content><![CDATA[
+            <div class="input-append">
+                <input id="${colName}" name="${colName}" readonly="readonly" type="text" value="${colValue}"/>
+                <a id="${colName}Button" href="javascript:" class="btn">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+            <div>
+            <script type="text/javascript">
+                $("#${colName}Button, #${colName}").click(function(){
+                    // 是否限制选择，如果限制，设置为disabled
+                    //if ($("#${colName}Button").hasClass("disabled")){
+                    //    return true;
+                    //}
+                    // 正常打开
+                    top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=2"), "选择科室", 300, 420, {
+                        ajaxData:{selectIds: $("#${colName}").val()},buttons:{"确定":"ok", "清除":"clear","关闭":true}, submit:function(v, h, f){
+                            if (v=="ok"){
+                                var tree = h.find("iframe")[0].contentWindow.tree;
+                                var names = [], nodes = [];
+                                nodes = tree.getSelectedNodes(true);
+                                for(var i=0; i<nodes.length; i++) {
+
+                                    $("#${colName}").val(nodes[i].name);
+                                    break;
+                                }
+
+                            }
+                            else if (v=="clear"){
+                                $("#${colName}").val("");
+                            }
+                            if(typeof ${colName}TreeselectCallBack == 'function'){
+                                ${colName}TreeselectCallBack(v, h, f);
+                            }
+                        }, loaded:function(h){
+                            $(".jbox-content", top.document).css("overflow-y","hidden");
+                        }
+                    });
+                });
+            </script>
+        ]]></content>
+    </component>
+    <!--职务选择-->
+    <component>
+        <value>selectRole</value>
+        <type>controlType</type>
+        <name>职务选择</name>
+        <content><![CDATA[
+            <div class="input-append">
+                <input id="${colName}" name="${colName}" readonly="readonly" type="text" value="${colValue}"/>
+                <a id="${colName}Button" href="javascript:" class="btn">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+            <div>
+            <script type="text/javascript">
+                $("#${colName}Button, #${colName}").click(function(){
+                    // 是否限制选择，如果限制，设置为disabled
+                  //  if ($("#${colName}Button").hasClass("disabled")){
+                   //     return true;
+                   // }
+                    // 正常打开
+                    top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3&child=role"), "选择角色", 300, 420, {
+                        ajaxData:{selectIds: $("#${colName}").val()},buttons:{"确定":"ok", "清除":"clear","关闭":true}, submit:function(v, h, f){
+                            if (v=="ok"){
+                                var tree = h.find("iframe")[0].contentWindow.tree;
+                                var names = [], nodes = [];
+                                nodes = tree.getSelectedNodes(true);
+                                for(var i=0; i<nodes.length; i++) {
+                                    if (nodes[i].level == 0){
+                                        top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+                                        return false;
+                                    }
+
+                                    $("#${colName}").val(nodes[i].name);
+                                    break;
+                                }
+
+                            }
+                            else if (v=="clear"){
+                                $("#${colName}").val("");
+                            }
+                            if(typeof ${colName}TreeselectCallBack == 'function'){
+                                ${colName}TreeselectCallBack(v, h, f);
+                            }
+                        }, loaded:function(h){
+                            $(".jbox-content", top.document).css("overflow-y","hidden");
+                        }
+                    });
+                });
+            </script>
+        ]]></content>
+    </component>
+    <!--单选选择-->
+    <component>
+        <value>radio</value>
+        <type>controlType</type>
+        <name>单选选择</name>
+        <content><![CDATA[
+            <input name="${colName}" type="radio" value="${value}" ${checked}/>${label}
+        ]]></content>
+    </component>
+    <!--多选选择-->
+    <component>
+        <value>checkbox</value>
+        <type>controlType</type>
+        <name>多选选择</name>
+        <content><![CDATA[
+            <input name="${colName}" type="checkbox" value="${value}" ${checked}/>${label}
+        ]]></content>
+    </component>
+    <!--下拉选项-->
+    <component>
+        <value>select</value>
+        <type>controlType</type>
+        <name>下拉选项</name>
+        <content><![CDATA[
+            <option value="${value}" ${selected}>${label}</option>
+        ]]></content>
+    </component>
+    <!--当前用户-->
+    <component>
+        <value>currentUser</value>
+        <type>controlType</type>
+        <name>当前用户名</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUsername</initMethod>
+    </component>
+    <!--当前用户性别-->
+    <component>
+        <value>currentUserSex</value>
+        <type>controlType</type>
+        <name>当前用户性别</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserSex</initMethod>
+    </component>
+    <!--当前用户职务-->
+    <component>
+        <value>currentUserGrade</value>
+        <type>controlType</type>
+        <name>当前用户职务</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserGrade</initMethod>
+    </component>
+    <!--当前用户手机号-->
+    <component>
+        <value>currentUserPhone</value>
+        <type>controlType</type>
+        <name>当前用户手机号</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserphone</initMethod>
+    </component>
+    <!--当前用户邮箱-->
+    <component>
+        <value>currentUserEmail</value>
+        <type>controlType</type>
+        <name>当前用户邮箱</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUseremail</initMethod>
+    </component>
+    <!--当前用户部门-->
+    <component>
+        <value>currentUserOffice</value>
+        <type>controlType</type>
+        <name>当前用户部门</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserOffice</initMethod>
+    </component>
+    <!--当前用户角色-->
+    <component>
+        <value>currentUserRoles</value>
+        <type>controlType</type>
+        <name>当前用户角色</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserRoles</initMethod>
+    </component>
+    <!--当前用户的公司-->
+    <component>
+        <value>currentUserCompany</value>
+        <type>controlType</type>
+        <name>当前用户公司</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserCompany</initMethod>
+    </component>
+    <!--当前用户的身份证号-->
+    <component>
+        <value>currentUserCardNo</value>
+        <type>controlType</type>
+        <name>当前用户身份证</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.modules.form.util.InitUtils.getUserCardNo</initMethod>
+    </component>
+    <!--当前日期-->
+    <component>
+        <value>currentDate</value>
+        <type>controlType</type>
+        <name>当前日期</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.common.utils.DateUtils.getDate</initMethod>
+    </component>
+    <!--当前日期时间-->
+    <component>
+        <value>currentDateTime</value>
+        <type>controlType</type>
+        <name>当前日期时间</name>
+        <content><![CDATA[
+            <input name="${colName}" type="hidden" value="${colValue}"/>
+            ${colValue}
+        ]]></content>
+        <initMethod>com.thinkgem.jeesite.common.utils.DateUtils.getDateTime</initMethod>
+    </component>
+
+
+    <!--填写模板-->
+    <component>
+        <value>flowForm</value>
+        <type>template</type>
+        <name>填写模板</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>M
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+
+	<title>审批管理</title>
+	<meta name="decorator" content="default"/>
+    <script src="/static/uploadify/ajaxfileupload.js" type="text/javascript"></script>
+       <script src="/static/layer/layer.js" type="text/javascript"></script>
+     <link href="/static/layer/layer.css" rel="stylesheet" type="text/css">
+
+    <!--<link href="/static/stream/stream-v1.css" rel="stylesheet" type="text/css">-->
+    <style>
+        .borderWidth2{
+            -webkit-border-width:1px;
+            -moz-border-width:1px;
+            -ms-border-width:1px;
+            -o-border-width:1px;
+            border-width:1px;
+            border-width:1px\0;
+        }
+    </style>
+	<script type="text/javascript">
+
+
+      $(function(){
+        $("table").eq(0).css("background","#fff").attr("id","cavas");
+		 $("table").each(function(i,e){
+           if($(this).attr("border")=="1"){
+           if($(this).find("table").length==0){
+                $(this).attr("border","1");
+                $(this).find("td").addClass("border","1px solid #333");
+            }
+           }
+           });
+     });
+
+     		$(document).ready(function() {
+            <#if id??>
+                $.get("${ctx}/act/task/histoicFlow?procInsId=${act.procInsId}&t="+new Date().getTime(), function(data){
+                    $("#histoicFlowList").html(data);
+                });
+
+                $('.table-form td').attr('nowrap','nowrap')
+                $initJs$
+            </#if>});
+	function save(){
+	document.getElementById("inputForm").action = '${ctx}/oa/targetHospital/save';
+          $("#inputForm").submit();
+           $.get('/a/sys/menu/selectMenuByName?name=1',function(data){
+					     if(data!=null){
+					     window.location="${ctx}"+data;
+					     }
+					});
+      }
+		$(document).ready(function() {
+		   document.getElementsByTagName('form')[0].onkeydown = function(e){
+            var e = e || event;
+            var keyNum = e.which || e.keyCode;
+            return keyNum==13 ? false : true;
+        };
+
+
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					<!--loading('正在提交，请稍等...');-->
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+
+});
+	</script>
+	<script type="text/javascript">
+	  function shanchuwj(){
+            document.getElementById('iframe2').contentWindow.document.getElementById('scxzwj').click();
+        }
+    function tjsq0() {
+        if (document.getElementById("AQZRR")) {
+            if (document.getElementById("AQZRR").value == '') {
+                alert("请选择安全责任人！");
+                return false;
+            }
+        }
+        if (document.getElementById("YC_FJ_FLAG")) {//若需要控制必须上传附件，需要在表单中添加一个<input type="hidden" id="YC_FJ_FLAG" name="YC_FJ_FLAG" value="1">
+            if (!(document.getElementById("taskDefKey").value == "modify")) {
+                if (document.getElementById("YC_FJ_FLAG").value == "1" && document.getElementById("FJMC").value == "") {
+                    alert("该申请单的提交必须附上附件，请选择您要提交的附件！");
+                    return false;
+                }
+            }
+        }
+        var flagCheck = check();
+        if (flagCheck) {
+            if($('#selectZdFlag').val() == '1' && !$('#ZDLoginNames').val()) {
+                alert("请指定下一审核人！")
+                return false;
+            }
+            document.getElementById("kssc").style.display = "none";
+            document.getElementById("yc_kssc").style.display = "";
+            document.getElementById("flag").value = 'yes';
+            document.getElementById("inputForm").action = '/a/oa/flow/save';
+            document.getElementById("inputForm").submit();
+        } else {
+            document.getElementById("kssc").style.display = "";
+            document.getElementById("yc_kssc").style.display = "none";
+        }
+    }
+
+  function lineBy(){
+       $.post('${ctx}/oa/flow/flowList?formNo=${formNo}&procDefId=${act.procDefId}&type=1', {}, function(str){
+          var p1 =layer.open({
+            type: 1,
+            area: ['1000px', '550px'],
+            content: str
+          });
+        });
+  }
+
+</script>
+<script>
+	       var checkSubmitFlg = false;
+            function checkSubmit() {
+                if (!checkSubmitFlg) {
+                    //第一次提交
+                    checkSubmitFlg = true;
+                    $('#flag').val('yes');
+                    return true;
+                } else {
+                    //重复提交
+                    return false;
+                }
+            }
+
+            var checkSubmitFlag = false;
+            function checkSubmitB() {
+                if (!checkSubmitFlag) {
+                    //第一次提交
+                    checkSubmitFlag = true;
+                    $('#flag').val('no');
+                    return true;
+                } else {
+                    //重复提交
+                    return false;
+                }
+            }
+</script>
+</head>
+<body>
+	<form id="inputForm" method="post" class="form-horizontal" action ="${ctx}/oa/flow/save">
+		<input type="hidden" name="id" value="${id}"/>
+			<input type="hidden" name="act.procDefIdFather" value="${act.procDefIdFather}"/>
+		<input type="hidden" name="act.taskId" value="${act.taskId}"/>
+		<input type="hidden" name="act.taskName" value="${act.taskName}"/>
+		<input type="hidden" name="GLBDLJ" value="${act.lines}"/>
+		<input type="hidden" name="GLBDMC" value="${act.linesName}"/>
+		<input type="hidden" id="taskDefKey" name="act.taskDefKey" value="${act.taskDefKey}"/>
+		<input type="hidden" name="act.procInsId" value="${act.procInsId}"/>
+		<input type="hidden" name="act.procDefId" value="${act.procDefId}"/>
+		<input type="hidden" id="flag" name="act.flag" value="${act.flag}"/>
+		<input type="hidden" id="BZ" name="BZ" value="${act.BZ}"/>
+		<input type="hidden" id="SFCC" name="SFCC" value="1"/>
+        <input type="hidden" name="tableName" value="${tableName}"/>
+        <input type="hidden" name="FJLJ" id="FJLJ" value=""/>
+        <input type="hidden" name="FJMC" id="FJMC" value=""/>
+        <input type="hidden" name="act.token" id="token" value="${act.token}"/>
+		<sys:message content="${message}"/>
+		<fieldset>
+                 <br/><br/>
+				$flowTableInfo$
+		</fieldset>
+		　<div id="divInfo"></div>
+		<div class="form-actions">
+		    <#if !(id??) || id == '' || act.taskDefKey == 'modify' || act.taskDefKey = 'edit' || act.taskDefKey = 'edit1' || act.taskDefKey = 'edit2'  || act.taskDefKey = 'edit3'|| act.taskDefKey = 'edit4'
+            || act.taskDefKey = 'edit5' || act.taskDefKey = 'edit6' >
+            		<div style="border: 0px currentColor; width: 80%; line-height:20px;">已关联表单：</div>
+            		    <#list flowInfo as item>
+		    <tr>
+				$tbodyHTML$
+			</tr>
+        </#list></br>
+		<div style="border: 0px currentColor; width: 80%; line-height:20px;">是否上传附件：</div><iframe id="iframe2" scrolling="no" src="/static/stream/stream.html" style="border: 0px currentColor; width: 90%; height: 265px;"></iframe>
+		    </#if>
+		    <div style="margin-left: 10px;">
+            <#if act.taskDefKey = 'edit' || act.taskDefKey = 'edit1' || act.taskDefKey = 'edit2'  || act.taskDefKey = 'edit3'|| act.taskDefKey = 'edit4'
+            || act.taskDefKey = 'edit5' || act.taskDefKey = 'edit6'>
+               <input id="btnSubmit" class="btn btn-primary" type="submit" value="确 认" onclick="checkSubmit()"/>&nbsp;
+               <input id="btnSubmit" class="btn btn-inverse" type="submit" value="驳 回" onclick="checkSubmitB()"/>&nbsp;
+            <#else>
+            <#if act.BZ?? && act.BZ != ''>
+                 <input id="btnSubmit3" class="btn btn-inverse" type="button" value="暂 存" onclick="save()"/>&nbsp;
+                 <input id="btnSubmit4" class="btn btn-inverse" type="submit" value="已 阅" onclick="checkSubmit()"/>&nbsp;
+              </#if>
+              <#if zdFlag == '1'>
+                    指定审核人/归档人：
+                       <input id="selectZdFlag" value = "1" type="hidden"/>
+                       <input id="ZDId" name="act.ZD" class="input-xxlarge required" type="hidden" value="">
+                       <input id="ZDLoginNames" name="act.ZDLoginNames" class="input-xxlarge required" type="hidden" value="">
+                       <input id="ZD" readonly="readonly" type="text" value="" />
+                       <a id="ZDButton" href="javascript:" class="btn" style="margin-left:-5px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+                       </#if>
+             <input id="kssc" class="btn btn-primary" type="button" value="提交申请"  onclick="tjsq0()" style="display: initial;"/>
+             <input id="yc_kssc" class="btn btn-primary" type="button" value="提交申请" style="display: none">
+			 <input class="btn btn-primary" type="button" value="删除选中文件" onclick="shanchuwj()">
+			  <input type="button" value="关联表单" class="btn btn-primary" onclick="lineBy()"/>
+              <#if id?? && id != ''>
+                 <input id="btnSubmit6" class="btn btn-inverse" type="submit" value="销毁申请" onclick="$('#flag').val('no')"/>&nbsp;
+              </#if>
+            </#if>
+
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)">
+            </div>
+
+     		</div>
+		<#if id?? && id != ''>
+			<legend>流转信息</legend>
+            <img src="${ctx}/act/task/trace/photo/${procDefId}/${executionId}"></img>
+		</#if>
+	</form>
+
+<script>
+//在确认提交申请的时候，显示上传的附件
+var def = document.getElementById("taskDefKey").value;
+if(def.indexOf("edit") == 0){
+    var  fjlj1= document.getElementById("fjlj1").innerHTML;
+    var  fjmc1= document.getElementById("fjmc1").innerHTML;
+    if(fjlj1 != "" && fjmc1 != ""){
+        var fjlj = fjlj1.substring(5,fjlj1.length)
+        var fjmc = fjmc1.substring(5,fjmc1.length)
+        document.getElementById("FJLJ").value = fjlj;
+        document.getElementById("FJMC").value = fjmc;
+    }
+}
+
+$("#ZDButton, #ZD").click(function(){
+            if ($("#ZDButton").hasClass("disabled")){
+                return true;
+            }
+            // 正常打开
+            top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3")+"&checked=true&chkStyle=radio", "选择人员", 300, 420, {
+                ajaxData:{selectIds: $("#ZDId").val()},buttons:{"确定":"ok","清除":"clear","关闭":true}, submit:function(v, h, f){
+                    if (v=="ok"){
+                        var tree = h.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+                        var ids = [], names = [], nodes = [], pids = [],loginNames = [];
+                        nodes = tree.getCheckedNodes(true);
+                        for(var i=0; i<nodes.length; i++) {//
+                            if (nodes[i].isParent){
+                                continue; // 如果为复选框选择，则过滤掉父节点
+                            }//</c:if><c:if test="true">
+                            if (nodes[i].level == 0){
+                                top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+                                return false;
+                            }//</c:if>
+                            if (nodes[i].isParent){
+                                top.$.jBox.tip("不能选择父节点（"+nodes[i].name+"）请重新选择。");
+                                return false;
+                            }
+                            ids.push(nodes[i].id);
+                            pids.push(nodes[i].pId);
+                            names.push(nodes[i].name);//
+                            loginNames.push(nodes[i].loginName);
+                        }
+                        $("#ZDId").val(ids.join(",").replace(/u_/ig,""));
+                        $("#ZDPid").val(pids.join(",").replace(/u_/ig,""));
+                        $("#ZD").val(names.join(","));
+                        $("#ZDLoginNames").val(loginNames.join(","));
+                    }
+                    else if (v=="clear"){
+                        $("#ZD").val("");
+                    }
+                    if(typeof ZDTreeselectCallBack == 'function'){
+                         ZDTreeselectCallBack(v, h, f);
+                    }
+                }, loaded:function(h){
+                    $(".jbox-content", top.document).css("overflow-y","hidden");
+                }
+            });
+	    });
+</script>
+
+</body>
+</html>
+        ]]></content>
+    </component>
+    <!--审批模板-->
+    <component>
+        <value>flowAudit</value>
+        <type>template</type>
+        <name>审批模板
+        </name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>审批管理</title>
+	<meta name="decorator" content="default"/>
+    <style>
+        .borderWidth2{
+            -webkit-border-width:1px;
+            -moz-border-width:1px;
+            -ms-border-width:1px;
+            -o-border-width:1px;
+            border-width:1px;
+            border-width:1px\0;
+        }
+
+        .form-horizontal .form-actions{
+            padding-left:20px;
+        }
+    </style>
+    <script>
+    $(function(){
+        $("table").eq(0).css("background","#fff").attr("id","cavas");
+		 $("table").each(function(i,e){
+           if($(this).attr("border")=="1"){
+           if($(this).find("table").length==0){
+                $(this).attr("border","1");
+                $(this).find("td").addClass("border","1px solid #333");
+            }
+           }
+           });
+     });
+    </script>
+
+	<script type="text/javascript">
+	var checkFlg = false;
+	function example(){
+	    if (!checkFlg) {
+	    checkFlg = true;
+        html2canvas(document.getElementById('cavas'),{
+        allowTaint: true,
+        taintTest: false,
+        onrendered: function(canvas) {
+            canvas.id = "mycanvas";
+            //document.body.appendChild(canvas);
+            //生成base64图片数据
+            var dataUrl = canvas.toDataURL();
+            $("#tbodyHtml").val(dataUrl);
+             $('#flag').val('yes');
+             $("#inputForm").submit();
+             return true;
+             }
+    });}else {
+            //重复提交
+              return false;
+             }
+     }
+
+		$(document).ready(function() {
+            $.get("${ctx}/act/task/histoicFlow?procInsId=${act.procInsId}&t="+new Date().getTime(), function(data){
+                $("#histoicFlowList").html(data);
+            });
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					<!--loading('正在提交，请稍等...');-->
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+
+		function preview() {
+        bdhtml=window.document.body.innerHTML;
+        zoom(parseInt($("#printSelect").val()));
+        window.document.body.innerHTML=$('table').eq(0).html();
+        setTimeout('yscz()',500);
+          }
+        function zoom(level)
+        {
+            var i = parseInt(document.body.style.zoom);
+            if (isNaN(i)) i=100;
+            newZoom= i * level / 100;
+            document.body.style.zoom=newZoom+'%';
+        }
+
+       function yscz(){
+            window.print();
+            document.body.style.width = "100%";
+            document.body.style.height = "100%";
+            window.document.body.innerHTML=bdhtml;
+            location.reload();
+        }
+
+	</script>
+
+	<script>
+	       var checkSubmitFlg = false;
+            function checkSubmit() {
+                if (!checkSubmitFlg) {
+                    if($('#selectZdFlag').val() == '1' && !$('#ZDLoginNames').val()) {
+                        alert("请指定下一审核人！")
+                        return false;
+                    }
+                    //第一次提交
+                    checkSubmitFlg = true;
+                    $('#flag').val('yes');
+                    if($('#caFlag').val() == '1') {
+                        var pic = ''
+                        try {
+                          pic = getSignPic();
+                        } catch (error) {
+                          console.error(error);
+                        }
+                        if(!pic) {
+                            alert("获取电子签名失败")
+                            checkSubmitFlg = false;
+                            return false;
+                        }
+                        $('#sigPic').val(pic)
+                    }
+                    return true;
+                } else {
+                    //重复提交
+                    return false;
+                }
+            }
+
+            var checkSubmitFlag = false;
+            function checkSubmitB() {
+                if (!checkSubmitFlag) {
+                    // 第一次提交
+                    checkSubmitFlag = true;
+                    $('#flag').val('no');
+                    if($('#caFlag').val() == '1') {
+                        var pic = ''
+                        try {
+                          pic = getSignPic();
+                        } catch (error) {
+                          console.error(error);
+                        }
+                        if(!pic) {
+                            alert("获取电子签名失败")
+                            checkSubmitFlg = false;
+                            return false;
+                        }
+                        $('#sigPic').val(pic)
+                    }
+                    return true;
+                } else {
+                    //重复提交
+                    return false;
+                }
+            }
+
+	</script>
+</head>
+<body>
+	<form id="inputForm" action="${ctx}/oa/flow/saveAudit" method="post" class="form-horizontal">
+		<input type="hidden" name="id" value="${id}"/>
+		<input type="hidden" name="act.taskId" value="${act.taskId}"/>
+		<input type="hidden" name="act.taskName" value="${act.taskName}"/>
+		<input type="hidden" name="act.taskDefKey" value="${act.taskDefKey}"/>
+		<input type="hidden" name="act.procInsId" value="${act.procInsId}"/>
+		<input type="hidden" name="act.procDefId" value="${act.procDefId}"/>
+		<input type="hidden" id="flag" name="act.flag" value="${act.flag}"/>
+		<input type="hidden" id="SFCC" name="act.SFCC" value="${act.SFCC}"/>
+		<input type="hidden" id="tbodyHtml" name="act.tbodyHtml" value="${act.tbodyHtml}"/>
+        <!--<input type="hidden" id="imgPath" name="imgPath" value="${imgPath}"/>-->
+        <input type="hidden" name="tableName" value="${tableName}"/>
+        <input type="hidden" id="caFlag" name="caFlag" value="${caFlag}"/>
+        <input type="hidden" id="base64Data" name="dsvsInfo.base64Data" value="${dsvs.base64Data}"/>
+        <input type="hidden" id="signData" name="dsvsInfo.signData" value="${dsvs.signData}"/>
+        <input type="hidden" id="serverCertificate" name="dsvsInfo.serverCertificate" value="${dsvs.serverCertificate}"/>
+        <input type="hidden" id="sig" name="dsvsInfo.sig"/>
+        <input type="hidden" id="sigPic" name="dsvsInfo.sigPic"/>
+        <input type="hidden" id="sigServer" name="dsvsInfo.sigServer"/>
+        <input type="hidden" id="certInfo" name="dsvsInfo.certInfo"/>
+        <select style="display:none" class="StandardWidth" id="id_cert_list" onchange="select_cert(this.value)"></select>
+
+		<sys:message content="${message}"/>
+
+		<fieldset>
+			<legend>${act.taskName}</legend>
+			     缩放比例：
+                <select id="printSelect" style="width:75px;">
+                    <option value="27">30%</option>
+                    <option value="45">50%</option>
+                    <option value="54">60%</option>
+                    <option value="63">70%</option>
+                    <option value="72">80%</option>
+                    <option value="76">85%</option>
+                    <option value="81">90%</option>
+                    <option value="85">95%</option>
+                    <option value="90" selected="true">100%</option>
+                    <option value="112">125%</option>
+                    <option value="135">150%</option>
+                    <option value="180">200%</option>
+                </select>
+            <input type="button" value="打印" onclick="preview()" />
+                $flowTableInfo$
+            <#if act.taskDefKey != 'apply_end'>
+            <legend>您的意见</legend>
+            <table class="table-form">
+                <tr>
+					<td>
+						<textarea name="act.comment"  rows="5" style="width: 98%" /></textarea>
+					</td>
+				</tr>
+            </table>
+            </#if>
+		</fieldset>
+
+		<div class="form-actions">
+		          <#if act.taskDefKey = 'apply_end'>
+                     <input id="btnSubmit" class="btn btn-primary" type="button" value="归 档" onclick="return example();"/>&nbsp;
+<!--                     <input id="btnSubmit" class="btn btn-inverse" type="submit" value="驳 回" onclick="return checkSubmitB();"/>&nbsp;-->
+                  <#elseif act.taskDefKey = 'apply_execute'|| act.taskDefKey = 'apply_execute1'||act.taskDefKey = 'apply_execute2'||
+                  act.taskDefKey = 'apply_execute3'||  act.taskDefKey = 'apply_execute4'||  act.taskDefKey = 'apply_execute5'||  act.taskDefKey = 'apply_execute6'||
+                   act.taskDefKey = 'apply_execute7'||  act.taskDefKey = 'apply_execute8'||  act.taskDefKey = 'apply_execute9'||  act.taskDefKey = 'apply_execute10'||
+                    act.taskDefKey = 'apply_execute11'||  act.taskDefKey = 'apply_execute12'||  act.taskDefKey = 'apply_execute13'||  act.taskDefKey = 'apply_execute14'||
+                     act.taskDefKey = 'apply_execute15'||  act.taskDefKey = 'apply_execute16'||  act.taskDefKey = 'apply_execute17'|| act.taskDefKey = 'apply_execute18'||
+                      act.taskDefKey = 'apply_execute19'|| act.taskDefKey = 'apply_execute20'>
+                      <input id="btnSubmit" class="btn btn-primary" type="submit" value="执 行" onclick="return checkSubmit();"/>&nbsp;
+                  <#elseif act.taskDefKey ?contains("apply_cs")>
+                      <input id="btnSubmit" class="btn btn-primary" type="submit" value="已 阅" onclick="return checkSubmit();"/>&nbsp;
+                  <#else>
+
+                    <input id="btnSubmit" class="btn btn-primary" type="submit" value="同 意" onclick="return checkSubmit();"/>&nbsp;
+                    <input id="btnSubmit" class="btn btn-inverse" type="submit" value="驳 回" onclick="return checkSubmitB();"/>&nbsp;
+                    <#if zdFlag == '1'>
+                    指定审核人/归档人：
+                       <input id="selectZdFlag" value = "1" type="hidden"/>
+                       <input id="ZDId" name="act.ZD" class="input-xxlarge required" type="hidden" value="">
+                       <input id="ZDLoginNames" name="act.ZDLoginNames" class="input-xxlarge required" type="hidden" value="">
+                       <input id="ZD" readonly="readonly" type="text" value="" />
+                       <a id="ZDButton" href="javascript:" class="btn" style="margin-left:-5px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
+                       </#if>
+<!--                     是否抄送：-->
+<!--                       <input id="CSId" name="act.CS" class="input-xxlarge required" type="hidden" value="">-->
+<!--                       <input id="CSLoginNames" name="act.CSLoginNames" class="input-xxlarge required" type="hidden" value="">-->
+<!--                       <input id="CS" readonly="readonly" type="text" value="" />-->
+<!--                       <a id="CSButton" href="javascript:" class="btn" style="margin-left:-5px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;-->
+                  </#if>
+ <script>
+         $("#CSButton, #CS").click(function(){
+                    // 是否限制选择，如果限制，设置为disabled
+		if ($("#CSButton").hasClass("disabled")){
+			return true;
+		}
+		// 正常打开
+		top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3")+"&checked=true", "选择人员", 300, 420, {
+			ajaxData:{selectIds: $("#CSId").val()},buttons:{"确定":"ok","清除":"clear","关闭":true}, submit:function(v, h, f){
+			    //selectIds控制回显，填入的必须是显示的值对应的id（所以CSId是必须用input定义和在下面的js中传值的），因为树结构实际对应的是id，不是name。
+				if (v=="ok"){
+					var tree = h.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+	                  <!--var currentname=document.getElementById("CS").value;-->
+					var ids = [], names = [], nodes = [], pids = [],loginNames = [];
+					if ("true" == "true"){
+						nodes = tree.getCheckedNodes(true);
+					}else{
+						nodes = tree.getSelectedNodes();
+					}
+					for(var i=0; i<nodes.length; i++) {//
+						if (nodes[i].isParent){
+							continue; // 如果为复选框选择，则过滤掉父节点
+						}//</c:if><c:if test="true">
+						if (nodes[i].level == 0){
+							top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+							return false;
+						}//</c:if>
+						if (nodes[i].isParent){
+							top.$.jBox.tip("不能选择父节点（"+nodes[i].name+"）请重新选择。");
+							return false;
+						}
+						ids.push(nodes[i].id);
+                        pids.push(nodes[i].pId);
+						names.push(nodes[i].name);//
+						loginNames.push(nodes[i].loginName);
+					}
+					$("#CSId").val(ids.join(",").replace(/u_/ig,""));
+					$("#CSPid").val(pids.join(",").replace(/u_/ig,""));
+					$("#CS").val(names.join(","));
+					$("#CSLoginNames").val(loginNames.join(","));
+				}
+				else if (v=="clear"){
+					$("#CS").val("");
+                }
+				if(typeof  CSTreeselectCallBack == 'function'){
+					 CSTreeselectCallBack(v, h, f);
+				}
+			}, loaded:function(h){
+				$(".jbox-content", top.document).css("overflow-y","hidden");
+			}
+		});
+		});
+
+
+		$("#ZDButton, #ZD").click(function(){
+            if ($("#ZDButton").hasClass("disabled")){
+                return true;
+            }
+            // 正常打开
+            top.$.jBox.open("iframe:${ctx}/tag/treeselect?url="+encodeURIComponent("/sys/office/treeData?type=3")+"&checked=true&chkStyle=radio", "选择人员", 300, 420, {
+                ajaxData:{selectIds: $("#ZDId").val()},buttons:{"确定":"ok","清除":"clear","关闭":true}, submit:function(v, h, f){
+                    if (v=="ok"){
+                        var tree = h.find("iframe")[0].contentWindow.tree;//h.find("iframe").contents();
+                        var ids = [], names = [], nodes = [], pids = [],loginNames = [];
+                        nodes = tree.getCheckedNodes(true);
+                        for(var i=0; i<nodes.length; i++) {//
+                            if (nodes[i].isParent){
+                                continue; // 如果为复选框选择，则过滤掉父节点
+                            }//</c:if><c:if test="true">
+                            if (nodes[i].level == 0){
+                                top.$.jBox.tip("不能选择根节点（"+nodes[i].name+"）请重新选择。");
+                                return false;
+                            }//</c:if>
+                            if (nodes[i].isParent){
+                                top.$.jBox.tip("不能选择父节点（"+nodes[i].name+"）请重新选择。");
+                                return false;
+                            }
+                            ids.push(nodes[i].id);
+                            pids.push(nodes[i].pId);
+                            names.push(nodes[i].name);//
+                            loginNames.push(nodes[i].loginName);
+                        }
+                        $("#ZDId").val(ids.join(",").replace(/u_/ig,""));
+                        $("#ZDPid").val(pids.join(",").replace(/u_/ig,""));
+                        $("#ZD").val(names.join(","));
+                        $("#ZDLoginNames").val(loginNames.join(","));
+                    }
+                    else if (v=="clear"){
+                        $("#ZD").val("");
+                    }
+                    if(typeof ZDTreeselectCallBack == 'function'){
+                         ZDTreeselectCallBack(v, h, f);
+                    }
+                }, loaded:function(h){
+                    $(".jbox-content", top.document).css("overflow-y","hidden");
+                }
+            });
+	    });
+	</script>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+		<legend>流转信息</legend>
+        <img src="${ctx}/act/task/trace/photo/${procDefId}/${executionId}"></img>
+	</form>
+	<script src="/static/js/xtxsync.js"></script>
+	<script>
+	    if($('#caFlag').val() == '1') {
+	        SetUserCertList("id_cert_list");
+	    }
+
+        function getSignPic() {
+            var certId = $('#id_cert_list').val();
+            if (!certId) {
+               return "";
+            }
+            var i = certId.indexOf("/");
+            if (i > 0) {
+              certId = certId.substring(0, i)
+            }
+            var sig = xtxsync.SOF_SignDataBase64($('#id_cert_list').val(), $('#base64Data').val());
+            if (sig == "") {
+                return;
+            }
+            console.log("数据签名成功...")
+            $('#sig').val(sig);
+            var sigServer = xtxsync.SOF_ExportUserCert($('#id_cert_list').val());
+            if (sigServer == "") {
+                return;
+            }
+            $('#sigServer').val(sigServer);
+
+            var certInfo = xtxsync.SOF_GetCertEntity(sigServer);
+             if (certInfo == "") {
+                return;
+            }
+            $('#certInfo').val(certInfo);
+
+            var strImgData = xtxsync.GetPicture(certId);
+            if (strImgData == "") {
+              return "";
+            }
+            var imgSrc="";
+            if (strImgData.substring(0, 4) == "R0lG") {
+              imgSrc = "data:image/gif;base64,";
+            } else if (strImgData.substring(0, 4) == "/9j/") {
+              imgSrc = "data:image/jpeg;base64,";
+            } else if (strImgData.substring(0, 4) == "iVBO") {
+              imgSrc = "data:image/png;base64,";
+            } else if (strImgData.substring(0, 4) == "SUkq") {
+              imgSrc = "data:image/tiff;base64,";
+            } else if (strImgData.substring(0, 2) == "Qk") {
+              imgSrc = "data:image/bmp;base64,";
+            } else {
+              imgSrc = "data:image/gif;base64,";
+            }
+            return imgSrc + strImgData;
+        }
+	</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+    <!--查看模板-->
+    <component>
+        <value>flowView</value>
+        <type>template</type>
+        <name>查看模板</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>流程查看</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+
+	      $(function(){
+        $("table").eq(0).css("background","#fff").attr("id","cavas");
+           $("table").each(function(i,e){
+           if($(this).attr("border")=="1"){
+            $(this).attr("border","2");
+            $(this).find("td").css("border-width","2px");
+           }
+           });
+     });
+
+
+		$(document).ready(function() {
+            $.get("${ctx}/act/task/histoicFlow?procInsId=${act.procInsId}&t="+new Date().getTime(), function(data){
+                $("#histoicFlowList").html(data);
+            });
+		});
+	</script>
+
+
+<style type="text/css">
+          span{width:100%; height:25px; line-height:25px; text-align:center; float:left;}
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+function preview() {
+        bdhtml=window.document.body.innerHTML;
+        zoom(parseInt($("#printSelect").val()));
+        window.document.body.innerHTML=$('table').eq(0).html();
+        setTimeout('yscz()',500);
+    }
+function zoom(level)
+{
+    var i = parseInt(document.body.style.zoom);
+    if (isNaN(i)) i=100;
+    newZoom= i * level / 100;
+    document.body.style.zoom=newZoom+'%';
+}
+
+   function yscz(){
+        window.print();
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
+        window.document.body.innerHTML=bdhtml;
+        location.reload();
+    }
+
+
+</script>
+	<form id="inputForm" action="#" method="post" class="form-horizontal">
+		<sys:message content="${message}"/>
+		<fieldset>
+			<legend>流程详情</legend>
+            缩放比例：
+            <select id="printSelect" style="width:75px;">
+                <option value="27">30%</option>
+                <option value="45">50%</option>
+                <option value="54">60%</option>
+                <option value="63">70%</option>
+                <option value="72">80%</option>
+                <option value="76">85%</option>
+                <option value="81">90%</option>
+                <option value="85">95%</option>
+                <option value="90" selected="true">100%</option>
+                <option value="112">125%</option>
+                <option value="135">150%</option>
+                <option value="180">200%</option>
+            </select>
+
+            <input type="button" value="打印" onclick="preview()" />
+
+                $flowTableInfo$
+		</fieldset>
+		<legend>流转信息</legend>
+        <img src="${ctx}/act/task/trace/photo/${procDefId}/${executionId}"></img>
+        <div class="form-actions">
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form>
+</body>
+</html>
+        ]]></content>
+    </component>
+    <!--我发起的流程-->
+    <component>
+        <value>myFlow</value>
+        <type>template</type>
+        <name>我发起的流程</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>我发起的流程</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+
+	      $(function(){
+        $("table").eq(0).css("background","#fff").attr("id","cavas");
+           $("table").each(function(i,e){
+           if($(this).attr("border")=="1"){
+            $(this).attr("border","2");
+            $(this).find("td").css("border-width","2px");
+           }
+           });
+     });
+	$(document).ready(function() {});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+
+        <#if BZ??>
+         document.getElementById('table1').style.display=none;
+        </#if>
+
+
+	</script>
+	 <style type="text/css">
+	    .table th, .table td {text-align: center;}
+	 </style>
+</head>
+<body >
+    <ul class="breadcrumb">
+        <li id="levelMenu1"><a href="#"></a> <span class="divider">/</span></li>
+        <li id="levelMenu2" class="active"></li>
+    </ul>
+
+	<form id="searchForm" action="${ctx}/oa/flow/myFlow" method="get" class="breadcrumb form-search">
+	    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<input id="procDefId" name="procDefId" type="hidden" value="${procDefId}"/>
+	</form>
+
+	<label id="message" style="color:red; font-weight:bold;">${message}</label>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" >
+		<thead>
+			<tr>
+				$theadHTML$
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<#list flowInfo as item>
+		    <tr>
+				$tbodyHTML$
+				<td>
+    				<a class = "aa" href="${ctx}/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+					<a href="${ctx}/oa/flow/deleteInfo?tableName=${tableName}&id=${item.id}&procInsId=${item.procInsId}&procDefId=${item.procDefId}" onclick="return confirmx('确认要撤回该流程吗？', this.href)">撤回</a>
+				</td>
+			</tr>
+        </#list>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/myjs.css"/>
+    <script type="text/javascript" src="/static/css/js/myjs.js" ></script>
+	<script>
+     $(function(){
+            $('.a').each(function(a){
+                $(this).on("click",function(){
+                    var url = $(".a").eq(a).find(".aa").attr("href");
+                    window.location.href=url;
+
+                });
+            });
+        });
+
+	       var mes=document.getElementById('message').innerHTML;
+           if(mes!=null&&mes!=""){
+               document.getElementById('message').innerHTML = mes.replace("<br>","，");
+               Showbo.Msg.alert(mes);
+               setTimeout(function(){
+                    Showbo.Msg.hide();
+               },3000);
+           }
+	</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+
+
+    <!--关联我发起的流程，-->
+    <component>
+        <value>mylineFlow</value>
+        <type>template</type>
+        <name>关联我发起的流程</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>关联我发起的流程</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+
+        <#if BZ??>
+         document.getElementById('table1').style.display=none;
+        </#if>
+  function deleteBy() {
+            var checked = false;
+            var ids = document.getElementsByName("checkbox");
+            var chestr = "";
+            for (var i = 0; i < ids.length; i++) {
+                if (ids[i].checked) {
+                    checked = true;
+                    chestr += ids[i].value + ",";
+                }
+            }
+            chestr=chestr.substring(0,chestr.length-1)
+            if (!checked) {
+                document.getElementById("ss").innerHTML = "<div style='color: #ffffff;background-color: #EF8F00;width: 140px;height: 25px;text-align: center;position: relative;bottom: 10px;left: -250px;line-height: 20px'>未选中任何</div>";
+                return;
+            }
+            window.location.href = "${ctx}/oa/flow/form?formNofather=${formNofather}&formNo=${formNo}&title=${title}&procDefId=${procDefId}&procDefIdFather=${procDefIdFather}&ids=" + chestr;
+
+
+        }
+
+	</script>
+	 <style type="text/css">
+	    .table th, .table td {text-align: center;}
+	 </style>
+	 <base target="_self" />
+</head>
+<body >
+    <ul class="breadcrumb">
+        <li id="levelMenu1"><a href="#"></a> <span class="divider">/</span></li>
+        <li id="levelMenu2" class="active"></li>
+    </ul>
+
+	<form id="searchForm" action="${ctx}/oa/flow/myFlow" method="get" class="breadcrumb form-search">
+	    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<input id="procDefId" name="procDefId" type="hidden" value="${procDefId}"/>
+	</form>
+
+	<label id="message" style="color:red; font-weight:bold;">${message}</label>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" >
+		<thead>
+                    <input type="button" value="确定" class="btn btn-success ;" onclick="deleteBy()">
+
+			<tr>
+                <th> </th>
+				$theadHTML$
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<#list flowInfo as item>
+		    <tr>
+		     <td style="width: 40px">
+                        <input type="checkbox" name="checkbox" value="${ctx}/oa/flow/form?id=${item.id}||formNo=${formNo}||showType=flowView||act.procInsId=${item.procInsId}">
+                    </td>
+				$tbodyHTML$
+				<td>
+    				<a href="${ctx}/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+
+				</td>
+			</tr>
+        </#list>
+		</tbody>
+	</table>
+
+	<div class="pagination">${page}</div>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/myjs.css"/>
+    <script type="text/javascript" src="/static/css/js/myjs.js" ></script>
+	<script>
+	       var mes=document.getElementById('message').innerHTML;
+           if(mes!=null&&mes!=""){
+               document.getElementById('message').innerHTML = mes.replace("<br>","，");
+               Showbo.Msg.alert(mes);
+               setTimeout(function(){
+                    Showbo.Msg.hide();
+               },3000);
+           }
+	</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+    <!--我发起的流程手机版(dt)-->
+    <component>
+        <value>myTouchFlow</value>
+        <type>template</type>
+        <name>我发起的流程</name>
+        <content><![CDATA[
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html lang="en">
+<head>
+	<meta name="decorator" content="footer"/>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport"/>
+    <link rel="stylesheet" href="/static/oaApp/css/mail.css" />
+</head>
+<body style="margin-top: -5px;">
+<div class="title_Infor">
+    <a href="/a/oa/flow/flowList" class="pull-left"><img src="/static/oaApp/img/liucheng_Icon/fanhui.png" />返回</a>
+    <h3 align="left">${title}</h3>
+</div>
+<div class="span6">
+	<label id="message" style="color:red; font-weight:bold;">${message}</label>
+    <#list flowInfo as item>
+    <c:set value="${item.procDefId}" var="procDefId"></c:set>
+    </#list>
+ <#list flowInfo as item>
+	<div class='widget-box bor_N'><div class='widget-content nopadding updates'>
+		 <div class='new-update clearfix Pos_R'>
+			 <div class='update-done ML_3 Inbox_Width_80' style="width:100% !important;min-width:100% !important;">
+			 	<span style="display: inline-block;">$tbodyHTML$</span>
+				<span class='Inbox_Con'></span>
+			 </div>
+			 <div class='update-date Inbox_Width_10' style="width:100% !important;text-align: right;">
+				 <a style="padding: 5px 10px;border: 1px solid white;" href="/a/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+				 <a style="padding: 5px 10px;border: 1px solid white;" href="/a/oa/flow/deleteInfo?tableName=${tableName}&id=${item.id}&procInsId=${item.procInsId}&procDefId=${item.procDefId}" onclick="return confirm('确认要撤回该流程数据吗？')">撤回</a></div>
+			</div>
+		 </div>
+	 </div>
+</#list>
+	</table>
+</div>
+    <img class="touchRun" style="position:absolute; bottom:0px;width: 400px;height: 200px;display: none;z-index: 999" src="/static/oaApp/img/loadTouch.gif"/>
+<script>
+   $(function(){
+        $('.new-update').each(function(a){
+            $(this).on("click",function(){
+                var url =  $(this).find("a").eq(0).attr("href");
+                window.location.href=url;
+
+            });
+        });
+    });
+	</script>
+<script src="/static/oaApp/js/oaScroll.js"></script>
+<script>
+    $(function(){
+        /*初始化*/
+        var pageNo = 2;
+        var pageSize = 20;
+         var p=0,t=0;
+        <#list flowInfo as item>
+        var procDefId='${item.procDefId}';
+        var time =Math.ceil(parseInt(${item.listAmount})/20);
+        </#list>
+        <!--/*监听加载更多*/
+        $(window).scroll(function(){
+         p = $(this).scrollTop();
+            //下滚
+            if(t<=p){
+            var url='${ctx}/oa/flow/touchFlow?procDefId='+procDefId+'&pageNo='+pageNo+'&pageSize='+pageSize;
+            touchScroll(pageNo,pageSize,time,url,".span6");
+            pageNo++;
+            t=p;
+            }
+             else{
+                return;
+            }
+        });-->
+    });
+</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+    <!--已办流程-->
+    <component>
+        <value>myDone</value>
+        <type>template</type>
+        <name>已办流程</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>已办流程</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+
+	      $(function(){
+        $("table").eq(0).css("background","#fff").attr("id","cavas");
+           $("table").each(function(i,e){
+           if($(this).attr("border")=="1"){
+            $(this).attr("border","2");
+            $(this).find("td").css("border-width","2px");
+           }
+           });
+     });
+
+		$(document).ready(function() {});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+	</script>
+	 <style type="text/css">
+	    .table th, .table td {text-align: center;}
+	 </style>
+</head>
+<body >
+    <ul class="breadcrumb">
+        <li id="levelMenu1"><a href="#"></a> <span class="divider">/</span></li>
+        <li id="levelMenu2" class="active"></li>
+    </ul>
+	<form  id="searchForm" action="${ctx}/act/task/myHistoricList" method="get" class="breadcrumb form-search">
+	    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+        <input id="procDefId" name="procDefId" type="hidden" value="${procDefId}"/>
+	</form>
+	<sys:message content="${message}"/>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" >
+		<thead>
+			<tr>
+				$theadHTML$
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<#list flowInfo as item>
+		    <tr  class = "a">
+				$tbodyHTML$
+				<td>
+    				      <a class="aa" href="/a/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+				</td>
+			</tr>
+        </#list>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+	<script type="text/javascript" src="/static/css/js/myjs.js" ></script>
+	<script>
+		   $(function(){
+            $('.a').each(function(a){
+                $(this).on("click",function(){
+                    var url = $(".a").eq(a).find(".aa").attr("href");
+                    window.location.href=url;
+
+                });
+            });
+        });
+        </script>
+</body>
+</html>
+        ]]></content>
+    </component>
+
+
+    <!--已办任务手机版(dt)-->
+    <component>
+        <value>myDoneMobile</value>
+        <type>template</type>
+        <name>已办任务</name>
+        <content><![CDATA[
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html lang="en">
+<head>
+	<meta name="decorator" content="footer"/>
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" name="viewport"/>
+    <link rel="stylesheet" href="/static/oaApp/css/mail.css" />
+</head>
+<body style="margin-top: -5px;">
+<div class="title_Infor">
+    <a href="/a/act/task/historicList" class="pull-left"><img src="/static/oaApp/img/liucheng_Icon/fanhui.png" />返回</a>
+    <h3 align="left">${title}</h3>
+</div>
+<div class="span6">
+	<label id="message" style="color:red; font-weight:bold;">${message}</label>
+    <#list flowInfo as item>
+    <c:set value="${item.procDefId}" var="procDefId"></c:set>
+    </#list>
+ <#list flowInfo as item>
+	<div class='widget-box bor_N'><div class='widget-content nopadding updates'>
+		 <div class='new-update clearfix Pos_R'>
+			 <div class='update-done ML_3 Inbox_Width_80' style="width:100% !important;min-width:100% !important;">
+			 	<span style="display: inline-block;">$tbodyHTML$</span>
+				<span class='Inbox_Con'></span>
+			 </div>
+			 <div class='update-date Inbox_Width_10' style="width:100% !important;text-align: right;">
+				 <a style="padding: 5px 10px;border: 1px solid white;" href="/a/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+			</div>
+		 </div>
+	 </div>
+</#list>
+	</table>
+</div>
+    <img class="touchRun" style="position:absolute; bottom:0px;width: 400px;height: 200px;display: none;z-index: 999" src="/static/oaApp/img/loadTouch.gif"/>
+<script src="/static/oaApp/js/oaScroll.js"></script>
+<script>
+    $(function(){
+        /*初始化*/
+        var pageNo = 2;
+        var pageSize = 20;
+         var p=0,t=0;
+        <#list flowInfo as item>
+        var procDefId='${item.procDefId}';
+        var time =Math.ceil(parseInt(${item.listAmount})/20);
+        </#list>
+        <!--/*监听加载更多*/
+        $(window).scroll(function(){
+         p = $(this).scrollTop();
+            //下滚
+            if(t<=p){
+            var url='${ctx}/oa/flow/touchFlow?procDefId='+procDefId+'&pageNo='+pageNo+'&pageSize='+pageSize;
+            touchScroll(pageNo,pageSize,time,url,".span6");
+            pageNo++;
+            t=p;
+            }
+             else{
+                return;
+            }
+        });-->
+    });
+</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+
+
+    <!--统计查询流程-->
+    <component>
+        <value>query</value>
+        <type>template</type>
+        <name>统计查询</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>统计查询</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+	function preview() {
+        bdhtml=window.document.body.innerHTML;
+        zoom(parseInt($("#printSelect").val()));
+        window.document.body.innerHTML=$('table').eq(0).html();
+        setTimeout('yscz()',500);
+    }
+    function zoom(level)
+    {
+        var i = parseInt(document.body.style.zoom);
+        if (isNaN(i)) i=100;
+        newZoom= i * level / 100;
+        document.body.style.zoom=newZoom+'%';
+    }
+
+   function yscz(){
+        window.print();
+        document.body.style.width = "100%";
+        document.body.style.height = "100%";
+        window.document.body.innerHTML=bdhtml;
+        location.reload();
+    }
+
+    $(document).ready(function() {});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+
+       //下拉框选择
+        var sel=function(){
+           var se=document.getElementsByName("fh")[0].value;
+           if(se=="3"){
+              document.getElementById('arriveDay').style.display='';
+           }else{
+              document.getElementById('arriveDay').style.display='none';
+           }
+
+        }
+
+        <#if BZ??>
+         document.getElementById('table1').style.display=none;
+        </#if>
+	</script>
+	 <style type="text/css">
+	    .table th, .table td {text-align: center;}
+	 </style>
+</head>
+<body >
+    <ul class="breadcrumb">
+        <li id="levelMenu1"><a href="#"></a> <span class="divider">/</span></li>
+        <li id="levelMenu2" class="active"></li>
+    </ul>
+	<form id="searchForm" action="${ctx}/oa/flow/query" method="get" class="breadcrumb form-search">
+	    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>流程：</label>
+                <select id="selfFlowSel" name="procDefId">
+                     $selfFlowHTML$
+                </select>
+			</li>
+			<li>姓名：<input type="text" name="name" style="width:100px"></li>
+			<li>部门：<input type="text" name="dept" style="width:100px"></li>
+			<li>开始日期：
+			<input name="startDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                   </li>
+			<li>结束日期：<input name="endDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/></li>
+            <li><label>天数：</label>
+            <select style="width:100px" name="fh" onchange=sel();>
+                <option value =""></option>
+                <option value ="1">大于等于</option>
+                <option value ="2">小于等于</option>
+                <option value ="3">介于</option>
+            </select>
+            <input type="text" name="numberDay" style="width:50px"/>
+            <input type="text" name="arriveDay" id="arriveDay" style="width:50px;display:none;"/>
+            </li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li> <label>缩放比例：</label>
+                <select id="printSelect" style="width:75px;">
+                    <option value="27">30%</option>
+                    <option value="45">50%</option>
+                    <option value="54">60%</option>
+                    <option value="63">70%</option>
+                    <option value="72">80%</option>
+                    <option value="76">85%</option>
+                    <option value="81">90%</option>
+                    <option value="85">95%</option>
+                    <option value="90" selected="true">100%</option>
+                    <option value="112">125%</option>
+                    <option value="135">150%</option>
+                    <option value="180">200%</option>
+                </select>
+            </li>
+			<li class="btns"><input  class="btn btn-primary" type="button" value="打印" onclick="preview()"/></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form>
+	<font color='red'><b>${message}</b></font>
+	<table  class="table">
+	<tr>
+	  <td>
+	      <table id="contentTable" class="table table-striped table-bordered table-condensed" >
+            <thead>
+                <tr>
+                    $theadHTML$
+                </tr>
+            </thead>
+            <tbody>
+            <#list flowInfo as item>
+                <tr>
+                    $tbodyHTML$
+                     <td>
+    				<a href="${ctx}/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+					<a href="${ctx}/oa/flow/deleteInfo?tableName=${tableName}&id=${item.id}&procInsId=${item.procInsId}" onclick="return confirmx('确认要删除该流程数据吗？', this.href)">删除</a>
+				</td>
+                </tr>
+
+            </#list>
+            </tbody>
+	     </table>
+	  </td>
+	</tr>
+	</table>
+	<div class="pagination">${page}</div>
+</body>
+</html>
+        ]]></content>
+    </component>
+
+
+    <!--人力资源管理者查询流程-->
+    <component>
+        <value>hrFlow</value>
+        <type>template</type>
+        <name>人力资源管理者查询流程</name>
+        <content><![CDATA[
+            <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>人力资源流程</title>
+	<meta name="decorator" content="default"/>
+	<script type="text/javascript">
+		$(document).ready(function() {});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+
+        <#if BZ??>
+         document.getElementById('table1').style.display=none;
+        </#if>
+
+
+	</script>
+	 <style type="text/css">
+	    .table th, .table td {text-align: center;}
+	 </style>
+</head>
+<body >
+    <ul class="breadcrumb">
+        <li id="levelMenu1"><a href="#"></a> <span class="divider">/</span></li>
+        <li id="levelMenu2" class="active"></li>
+    </ul>
+	<form id="searchForm" action="${ctx}/oa/flow/myFlow" method="get" class="breadcrumb form-search">
+	    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="$ {page.pageSize}"/>
+		<ul class="ul-form">
+			<li><label>流程：</label>
+                <select id="selfFlowSel" name="procDefId">
+                    $selfFlowHTML$
+                </select>
+			</li>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+			<li class="clearfix"></li>
+		</ul>
+	</form>
+
+	<label id="message" style="color:red; font-weight:bold;">${message}</label>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed" >
+		<thead>
+			<tr>
+				$theadHTML$
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<#list flowInfo as item>
+		    <tr>
+				$tbodyHTML$
+				<td>
+    				<a href="${ctx}/oa/flow/form?id=${item.id}&formNo=${formNo}&showType=flowView&act.procInsId=${item.procInsId}">详情</a>
+					<!--<a href="${ctx}/oa/flow/deleteInfo?tableName=${tableName}&id=${item.id}&procInsId=${item.procInsId}" onclick="return confirmx('确认要删除该流程数据吗？', this.href)">删除</a>-->
+				</td>
+			</tr>
+        </#list>
+		</tbody>
+	</table>
+	<div class="pagination">${page}</div>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/myjs.css"/>
+    <script type="text/javascript" src="/static/css/js/myjs.js" ></script>
+	<script>
+	       var mes=document.getElementById('message').innerHTML;
+           if(mes!=null&&mes!=""){
+               document.getElementById('message').innerHTML = mes.replace("<br>","，");
+               Showbo.Msg.alert(mes);
+               setTimeout(function(){
+                    Showbo.Msg.hide();
+               },3000);
+           }
+	</script>
+</body>
+</html>
+        ]]></content>
+    </component>
+
+
+    <component>
+        <value>radioInit</value>
+        <type>initJs</type>
+        <name>初始化单选</name>
+        <content><![CDATA[
+            $("input[name='${colName}'][value='${colValue}']").attr('checked',true);
+        ]]></content>
+    </component>
+    <component>
+        <value>checkboxInit</value>
+        <type>initJs</type>
+        <name>初始化多选</name>
+        <content><![CDATA[
+            var sel = '${colValue}'.split(',')
+            for(var i=0;i<sel.length;i++){
+                $("input[name='${colName}']").each(function(){
+                    if ($(this).val() == sel[i]) {
+                        this.checked=true;
+                    }
+                });
+            }
+        ]]></content>
+    </component>
+    <component>
+        <value>selectInit</value>
+        <type>initJs</type>
+        <name>初始化下拉框</name>
+        <content><![CDATA[
+            $('#${colName}').val('${colValue}');
+        ]]></content>
+    </component>
+</components>
+

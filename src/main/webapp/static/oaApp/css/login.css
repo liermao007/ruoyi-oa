@@ -1,0 +1,56 @@
+/**��Ŀ���ƶ��˵�¼DEMO
+*����: Wzp
+*2017/8/22
+*/
+.login_Con{ width: 100%; height: 100%;
+    padding: 0 30px;
+    background: url("../images/login/login_Bg_blue_allMobile.jpg") no-repeat;
+    filter:"progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/login/login_Bg_blue_allMobile.jpg',  sizingMethod='scale')";
+    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='../images/login/login_Bg_blue_allMobile.jpg',sizingMethod='scale')";
+    background-size:cover;
+    -moz-background-size:cover;
+    -webkit-background-size:cover;
+    -o-background-size:cover;
+    position: relative;
+}
+.login_Logo{
+    width: 100%; height: auto;
+    margin-top: 30%;
+    margin-bottom: 60px;
+    float: left;
+}
+.login_Logo img{ width: 100%;}
+.login_User,.login_Pass,.login_Btn{ width: 100%; height: 50px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid #fff; float: left;
+    margin-bottom: 30px; position: relative;
+    overflow: hidden;
+}
+/*���ڵ�Iconͼ��*/
+.login_User_Img,.login_Pass_Img{
+    width: 30px; height: 30px;
+    display: inline-block;
+    float: left; margin-left: 15px; margin-top:9px;
+
+}
+.login_User_Img img,.login_Pass_Img img{ width: 30px; height: 30px;}
+.login_User input,.login_Pass input{ width:calc(100% - 65px);  height: 100%; float: right; margin-left: 20px; border: 0; background: none; outline: none; font-size: 20px;}
+/*��¼��ť*/
+.login_Btn{ background:rgba(28,183,255,.8); border: 0; line-height: 50px;text-align: center; margin-bottom: 20px;}
+.login_Btn input{    background: none;
+    border: 0;
+    width: 100%;
+    height: 100%; color: #fff  }
+
+/*��ס��*/
+.reader_Me{ width: 100%; height: 30px;float: left; font-size: 18px; color: #fff; line-height: 30px;}
+.reader_Me>div{ height: 30px;}
+.reader_Me .true_Me{ width: 20px; height: 20px; display: inline-block; margin-top: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border:1px solid #fff; margin-right: 10px;
+}
+.reader_Me>div>a{ color: #24aaed;}

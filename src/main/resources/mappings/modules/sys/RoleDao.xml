@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.RoleDao">
+    
+    <resultMap id="roleResult" type="Role">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+        <result property="dataScope" column="dataScope" />
+		<result property="enname" column="enname" />
+		<result property="roleType" column="roleType" />
+		<result property="dataScope" column="dataScope" />
+		<result property="remarks" column="remarks" />
+		<result property="useable" column="useable" />
+		<result property="sysData" column="sysData" />
+        <result property="office.id" column="office.id"></result>
+        <result property="office.name" column="office.name"></result>
+		<collection property="menuList" ofType="Menu">
+			<id property="id" column="menuList.id" />
+		</collection>
+		<collection property="officeList" ofType="Office">
+			<id property="id" column="officeList.id" />
+		</collection>
+	</resultMap>
+	
+    <sql id="roleColumns">
+    	a.id,
+    	a.office_id AS "office.id",
+    	a.name,
+    	a.enname,
+    	a.role_type AS roleType,
+		a.data_scope AS dataScope,
+		a.remarks,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+    	o.name AS "office.name",
+    	o.code,
+    	a.useable AS useable,
+    	a.is_sys AS sysData,
+    	a.dept_id as deptId
+    </sql>
+    
+	<select id="get" resultMap="roleResult">
+		SELECT
+			<include refid="roleColumns"/>,
+			rm.menu_id AS "menuList.id",
+			ro.office_id AS "officeList.id"
+		FROM sys_role a
+		JOIN sys_office o ON o.id = a.office_id
+		LEFT JOIN sys_role_menu rm ON rm.role_id = a.id
+		LEFT JOIN sys_role_office ro ON ro.role_id = a.id
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="getByName" resultType="Role">
+		SELECT
+			<include refid="roleColumns"/>
+		FROM sys_role a
+		JOIN sys_office o ON o.id = a.office_id
+		WHERE a.name = #{name} AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+
+    <select id="getByUserId" resultType="Role">
+        SELECT
+        role_id
+        FROM sys_user_role a
+        WHERE a.user_id = #{userId}
+    </select>
+
+    <select id="getByRoleName" resultType="Role">
+        SELECT
+        a.role_id,
+        s.name,
+        s.data_scope
+        FROM sys_user_role a,sys_role s
+        WHERE  s.id = a.role_id  and  a.user_id = #{userId}
+    </select>
+
+    <select id="getRoleByUserId" resultType="Role">
+        SELECT
+        name,
+        role_id
+        FROM sys_user_role a ,sys_role s
+        WHERE a.role_id = s.id and  a.user_id = #{userId}
+    </select>
+
+	<select id="getByEnname" resultType="Role">
+		SELECT
+			<include refid="roleColumns"/>
+		FROM sys_role a
+		JOIN sys_office o ON o.id = a.office_id
+		WHERE a.enname = #{enname} AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+	<select id="findList" resultMap="roleResult">
+		SELECT
+			<include refid="roleColumns"/>,
+			ro.office_id AS "officeList.id"
+		FROM sys_role a
+		LEFT JOIN sys_office o ON o.id = a.office_id
+		LEFT JOIN sys_user_role ur ON ur.role_id = a.id
+		LEFT JOIN sys_user u ON u.id = ur.user_id
+		LEFT JOIN sys_role_office ro ON ro.role_id = a.id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} AND a.useable=#{useable}
+		<if test="user != null and user.id != null and user.id != ''">
+			AND u.id = #{user.id}
+		</if>
+		<if test="user != null and user.loginName != null and user.loginName != ''">
+			AND u.login_name = #{user.loginName}
+		</if>
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		ORDER BY o.code, a.name
+	</select>
+	
+	<select id="findAllList" resultType="Role">
+		SELECT
+			<include refid="roleColumns"/>
+		FROM sys_role a
+		LEFT JOIN sys_office o ON o.id = a.office_id
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY o.code, a.name
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_role(
+			id, 
+			office_id, 
+			name, 
+			enname, 
+			role_type, 
+			data_scope, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			del_flag,
+			is_sys,
+			useable,
+			dept_id
+		) VALUES (
+			#{id}, 
+			#{office.id}, 
+			#{name}, 
+			#{enname}, 
+			#{roleType}, 
+			#{dataScope}, 
+			#{createBy.id}, 
+			#{createDate}, 
+			#{updateBy.id}, 
+			#{updateDate}, 
+			#{remarks}, 
+			#{delFlag},
+			#{sysData},
+			#{useable},
+			#{deptId}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_role SET 
+			office_id = #{office.id}, 
+			name = #{name}, 
+			enname = #{enname}, 
+			role_type = #{roleType}, 
+			data_scope = #{dataScope}, 
+			update_by = #{updateBy.id}, 
+			update_date = #{updateDate}, 
+			remarks = #{remarks},
+			is_sys = #{sysData},
+			useable = #{useable},
+			dept_id=#{deptId}
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteRoleMenu">
+		DELETE FROM sys_role_menu WHERE role_id = #{id}
+	</delete>
+	
+	<insert id="insertRoleMenu">
+		INSERT INTO sys_role_menu(role_id, menu_id)
+		<foreach collection="menuList" item="menu" separator=" union all ">
+			SELECT #{id}, #{menu.id}
+			<if test="dbName != 'mssql'">
+			FROM dual
+			</if>
+		</foreach>
+	</insert>
+	
+	<delete id="deleteRoleOffice">
+		DELETE FROM sys_role_office WHERE role_id = #{id}
+	</delete>
+	
+	<insert id="insertRoleOffice">
+		INSERT INTO sys_role_office(role_id, office_id)
+		<foreach collection="officeList" item="office" separator=" union all ">
+			SELECT #{id}, #{office.id}
+			<if test="dbName != 'mssql'">
+			FROM dual
+			</if>
+		</foreach>
+	</insert>
+	
+	<update id="delete">
+		UPDATE sys_role SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+    <!-- 根据OfficeId获取角色（树查询角色时用） -->
+    <select id="findRoleByOfficeId" resultType="Role" useCache="true">
+        SELECT
+        a.id, a.name, a.enname
+        FROM sys_role a
+        WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+        AND a.office_id = #{office.id}
+        ORDER BY a.name
+    </select>
+
+    <!--根据部门Id查询该部门下的所有的角色-->
+    <select id="findRoleByDept" resultType="Role" useCache="true">
+        SELECT
+        a.id, a.name, a.enname
+        FROM sys_role a
+        WHERE a.del_flag = '0'
+        <if test="deptId !=null and deptId!=''">
+            and dept_id=#{deptId}
+        </if>
+        ORDER BY a.remarks
+    </select>
+</mapper>

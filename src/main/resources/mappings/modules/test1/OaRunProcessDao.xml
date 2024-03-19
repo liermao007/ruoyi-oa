@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.test1.dao.OaRunProcessDao">
+
+	<sql id="oaRunProcessColumns">
+		a.id AS "id",
+		a.agent AS "agent",
+		a.agentid AS "agentid",
+		a.principal AS "principal",
+		a.principalid AS "principalid",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.by_Flag AS "byFlag",
+		a.org_id as "orgId"
+	</sql>
+
+	<sql id="oaRunProcessJoins">
+	</sql>
+
+	<select id="get" resultType="OaRunProcess">
+		SELECT
+		<include refid="oaRunProcessColumns"/>
+		FROM oa_run_process a
+		<include refid="oaRunProcessJoins"/>
+		WHERE  1=1
+		<if test="agentid !=null and agentid !=''">
+			and  a.agentid = #{agentid}
+		</if>
+		<if test="principalid !=null and principalid !=''">
+			and  a.principalid = #{principalid}
+		</if>
+
+		<if test="byFlag !=null and byFlag !=''">
+			AND a.by_Flag = #{byFlag}
+		</if>
+
+	</select>
+
+	<select id="findList" resultType="OaRunProcess">
+		SELECT
+		GROUP_CONCAT(a.principalid SEPARATOR ',')  AS "principalid",
+		GROUP_CONCAT(a.principal SEPARATOR ',')  AS "principal",
+-- 		a.agentid AS "agentid",
+-- 		a.agent AS "agent",
+		a.agentid AS "agentid",
+		a.agent AS "agent"
+		FROM oa_run_process a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} AND a.by_Flag = #{byFlag} AND a.org_id = #{orgId}
+		</where>
+		group by a.agentid
+	</select>
+
+	<select id="selectCheck" resultType="OaRunProcess">
+		SELECT
+		GROUP_CONCAT(a.principalid SEPARATOR ',')  AS "principalid",
+		GROUP_CONCAT(a.principal SEPARATOR ',')  AS "principal",
+		-- 		a.agentid AS "agentid",
+		-- 		a.agent AS "agent",
+		a.agentid AS "agentid",
+		a.agent AS "agent"
+		FROM oa_run_process a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} AND a.by_Flag = #{byFlag} AND a.agentid = #{agentid}
+		</where>
+		group by a.agentid
+	</select>
+
+	<select id="findById" resultType="OaRunProcess">
+		SELECT
+		<include refid="oaRunProcessColumns"/>
+		FROM oa_run_process a
+		<include refid="oaRunProcessJoins"/>
+		WHERE a.agentid = #{agentid} AND a.by_Flag = #{byFlag}
+	</select>
+
+	<select id="findAllList" resultType="OaRunProcess">
+		SELECT
+		<include refid="oaRunProcessColumns"/>
+		FROM oa_run_process a
+		<include refid="oaRunProcessJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL} AND a.by_Flag = #{byFlag}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO oa_run_process(
+		id,
+		agent,
+		agentid,
+		principal,
+		principalid,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		by_flag,
+		org_Id
+		) VALUES (
+		#{id},
+		#{agent},
+		#{agentid},
+		#{principal},
+		#{principalid},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{byFlag},
+		#{orgId}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE oa_run_process SET
+		agentid = #{agentid},
+		agent = #{agent},
+		principalid = #{principalid},
+		principal = #{principal},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		org_Id = #{orgId}
+		WHERE id = #{id} AND by_Flag = #{byFlag}
+	</update>
+
+	<update id="update1">
+		UPDATE act_ru_task SET ASSIGNEE_=#{loginName} where PROC_INST_ID_=#{instId} AND ASSIGNEE_=#{principal}
+	</update>
+
+	<update id="update2">
+		UPDATE act_hi_actinst SET ASSIGNEE_=#{loginName} where PROC_INST_ID_=#{instId} AND END_TIME_ IS NULL AND ASSIGNEE_=#{principal}
+	</update>
+
+	<update id="update3">
+		UPDATE act_hi_taskinst SET ASSIGNEE_=#{loginName} where PROC_INST_ID_=#{instId} AND ASSIGNEE_=#{principal}
+	</update>
+
+	<select id="selectId" resultType="java.lang.String">
+		SELECT ASSIGNEE_ FROM act_ru_task WHERE PROC_INST_ID_=#{instId}
+	</select>
+
+
+
+	<select id="findInstId" resultType="java.lang.String">
+		SELECT
+			PROC_INST_ID_
+		FROM act_ru_task
+		WHERE id_ = #{taskId}
+	</select>
+
+	<update id="delete">
+		DELETE FROM oa_run_process
+		WHERE agentid = #{oldAgentid} AND by_Flag = #{byFlag}
+	</update>
+
+</mapper>

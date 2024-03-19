@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+    
+  <description>JSTL 1.1 functions library</description>
+  <display-name>JSTL functions oa</display-name>
+  <tlib-version>1.1</tlib-version>
+  <short-name>fno</short-name>
+  <uri>http://java.sun.com/jsp/jstl/functionso</uri>
+
+  <function>
+    <description>获取所有新闻审核官</description>
+    <name>getAuditManAllList</name>
+    <function-class>com.thinkgem.jeesite.modules.oa.units.CommonUtils</function-class>
+    <function-signature>java.util.List getAuditManAllList()</function-signature>
+    <example>${fno:getAuditManAllList()}</example>
+  </function>
+
+    <function>
+        <description>获取所有个人通知</description>
+        <name>getMyNotify</name>
+        <function-class>com.thinkgem.jeesite.modules.oa.units.InfoUtils</function-class>
+        <function-signature>java.util.List getMyNotify()</function-signature>
+        <example>${fno:getMyNotify()}</example>
+    </function>
+
+    <function>
+        <description>获取日程安排</description>
+        <name>getSchedules</name>
+        <function-class>com.thinkgem.jeesite.modules.oa.units.InfoUtils</function-class>
+        <function-signature>java.util.List getSchedules(java.lang.String)</function-signature>
+        <example>${fno:getSchedules(flag)}</example>
+    </function>
+
+    <function>
+        <description>根据表明获取自定义表</description>
+        <name>findByTableName</name>
+        <function-class>com.thinkgem.jeesite.modules.table.utils.DefineTableUtils</function-class>
+        <function-signature>com.thinkgem.jeesite.modules.table.entity.OaPersonDefineTable findByTableName(java.lang.String)</function-signature>
+        <example>${fno:findByTableName(tableName)}</example>
+    </function>
+
+    <function>
+        <description>获取流程列表</description>
+        <name>processList</name>
+        <function-class>com.thinkgem.jeesite.modules.act.utils.ProcessDefUtils</function-class>
+        <function-signature>java.util.List processList(java.lang.String)</function-signature>
+        <example>${fno:processList(category)}</example>
+    </function>
+</taglib>

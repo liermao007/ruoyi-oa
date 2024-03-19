@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.oa.dao.ProcurementApplicationDao">
+    
+	<sql id="procurementApplicationColumns">
+		a.id AS "id",
+		a.col183 AS "col183",
+		a.col184 AS "col184",
+		a.col185 AS "col185",
+		a.col186 AS "col186",
+		a.col187 AS "col187",
+		a.col188 AS "col188",
+		a.col189 AS "col189",
+		a.col191 AS "col191",
+		a.col192 AS "col192",
+		a.col193 AS "col193",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.proc_ins_id AS "procInsId",
+		a.proc_def_id AS "procDefId",
+		a.sfgdzc AS "sfgdzc",
+		a.xzbmyj AS "xzbmyj",
+		a.bmldyj AS "bmldyj",
+		a.zjlyj AS "zjlyj",
+		a.bzsj AS "bzsj",
+		a.fjmc AS "fjmc",
+		a.fjlj AS "fjlj",
+		a.cwjbr AS "cwjbr",
+		a.ghqd AS "ghqd",
+		a.bgjj AS "bgjj",
+		a.bgyp AS "bgyp",
+		a.qt AS "qt",
+		a.cwxzbyj AS "cwxzbyj"
+	</sql>
+	
+	<sql id="procurementApplicationJoins">
+	</sql>
+    
+	<select id="get" resultType="ProcurementApplication">
+		SELECT 
+			<include refid="procurementApplicationColumns"/>
+		FROM procurement_application a
+		<include refid="procurementApplicationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProcurementApplication">
+		SELECT 
+			<include refid="procurementApplicationColumns"/>
+		FROM procurement_application a
+		<include refid="procurementApplicationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="col185 != null and col185 != ''">
+				AND a.col185 = #{col185}
+			</if>
+			<if test="col187 != null and col187 != ''">
+				AND a.col187 = #{col187}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProcurementApplication">
+		SELECT 
+			<include refid="procurementApplicationColumns"/>
+		FROM procurement_application a
+		<include refid="procurementApplicationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO procurement_application(
+			id,
+			col183,
+			col184,
+			col185,
+			col186,
+			col187,
+			col188,
+			col189,
+			col191,
+			col192,
+			col193,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			proc_ins_id,
+			proc_def_id,
+			sfgdzc,
+			xzbmyj,
+			bmldyj,
+			zjlyj,
+			bzsj,
+			fjmc,
+			fjlj,
+			cwjbr,
+			ghqd,
+			bgjj,
+			bgyp,
+			qt,
+			cwxzbyj
+		) VALUES (
+			#{id},
+			#{col183},
+			#{col184},
+			#{col185},
+			#{col186},
+			#{col187},
+			#{col188},
+			#{col189},
+			#{col191},
+			#{col192},
+			#{col193},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{procInsId},
+			#{procDefId},
+			#{sfgdzc},
+			#{xzbmyj},
+			#{bmldyj},
+			#{zjlyj},
+			#{bzsj},
+			#{fjmc},
+			#{fjlj},
+			#{cwjbr},
+			#{ghqd},
+			#{bgjj},
+			#{bgyp},
+			#{qt},
+			#{cwxzbyj}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE procurement_application SET 	
+			col183 = #{col183},
+			col184 = #{col184},
+			col185 = #{col185},
+			col186 = #{col186},
+			col187 = #{col187},
+			col188 = #{col188},
+			col189 = #{col189},
+			col191 = #{col191},
+			col192 = #{col192},
+			col193 = #{col193},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			proc_ins_id = #{procInsId},
+			proc_def_id = #{procDefId},
+			sfgdzc = #{sfgdzc},
+			xzbmyj = #{xzbmyj},
+			bmldyj = #{bmldyj},
+			zjlyj = #{zjlyj},
+			bzsj = #{bzsj},
+			fjmc = #{fjmc},
+			fjlj = #{fjlj},
+			cwjbr = #{cwjbr},
+			ghqd = #{ghqd},
+			bgjj = #{bgjj},
+			bgyp = #{bgyp},
+			qt = #{qt},
+			cwxzbyj = #{cwxzbyj}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE procurement_application SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
