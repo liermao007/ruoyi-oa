@@ -293,7 +293,7 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                             Page<Map<String, Object>> page = getPageFlowInfo(new Page<FlowData>(request, response), paramMap);
                                             List<Map<String, Object>> flowInfo = page.getList();
 
-                                            flowParam.setDatas(new HashMap<String, Object>());
+                                            flowParam.setDatas(new HashMap<>());
                                             flowParam.getDatas().put("flowInfo", flowInfo);
                                             flowParam.getDatas().put("page", page);
                                             flowParam.getDatas().put("title", form.getTitle());

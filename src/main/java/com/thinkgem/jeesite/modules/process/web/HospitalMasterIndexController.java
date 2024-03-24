@@ -97,18 +97,6 @@ public class HospitalMasterIndexController extends BaseController {
             companyId = UserUtils.getUser().getCompany().getId();
         }
         List<Office> offices = officeService.findCompany(companyId);
-        /*for (int j = 0; j < offices.size(); j++) {
-            Object o = offices.get(j);
-            sb.append(((User) o).getId() + ",");
-        }
-        if (StringUtils.isNotBlank(sb.toString())) {
-            hospitalMasterIndex.setOrgIds(sb.substring(0, sb.length() - 1).split(","));
-        } else {
-            String[] orgIds = null;
-            orgIds = new String[1];
-            orgIds[0] = companyId;
-            hospitalMasterIndex.setOrgIds(orgIds);
-        }*/
         if (offices != null && offices.size() > 0) {
             for (int i = 0; i < offices.size(); i++) {
                 Object o = offices.get(i);
@@ -240,7 +228,6 @@ public class HospitalMasterIndexController extends BaseController {
         else if (month >= 7 && month <= 9) // 7-9月;6,7,8
             return months[2];
         else
-            // 10-12月;10,11,12
             return months[3];
     }
 }
