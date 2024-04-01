@@ -248,13 +248,4 @@ public class Cryptos {
 			throw Exceptions.unchecked(e);
 		}
 	}
-
-	/**
-	 * 生成随机向量,默认大小为cipher.getBlockSize(), 16字节.
-	 */
-	public static byte[] generateIV() {
-		byte[] bytes = new byte[DEFAULT_IVSIZE];
-		random.nextBytes(bytes);
-		return bytes;
-	}
 }
