@@ -18,10 +18,4 @@ public class FlowData extends ActEntity<FlowData> {
     private Map<String,Object> datas;
     private String formNo;  // 表单编号
     private String flowFlag;
-    private String showType; //显示类型  flowForm填写，flowView查看，flowAudit审核
-    private String sql;
-    private String imgPath;
-    private String BZ;     //标识
-    private String SFCC;   //是否出差
-    private DsvsInfo dsvsInfo;
 }
