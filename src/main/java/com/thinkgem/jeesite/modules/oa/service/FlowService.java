@@ -220,16 +220,7 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                                     String str1 = "";
                                                     String Mobile = "";
                                                     List<String> Mobiles = new ArrayList<>();
-                                                    for (IdentityLink il : IdentityLinks) {
-                                                        String id1 = il.getUserId();
-                                                        User u = new User();
-                                                        u.setLoginName(id);
-                                                        String name1 = user.getName();
-                                                        str += name1 + "、";
-                                                        str1 = str.substring(0, str.length() - 1);
-                                                        Mobile = user.getMobile();
-                                                        Mobiles.add(Mobile);
-                                                    }
+
                                                     for (int i = 0; i < Mobiles.size(); i++) {
                                                         SmsModule.flowWork(companyId,Mobiles.get(i), str1, name, tableComment1);
                                                         System.out.println(str1 + "您好，您有待办流程：" + name + "发起了" + tableComment + "，请您尽快处理。");
