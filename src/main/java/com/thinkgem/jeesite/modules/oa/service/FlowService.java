@@ -227,13 +227,7 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                                     }
                                                 }
                                             } else {
-                                                String name1 = null;
-                                                String Mobile = null;
-                                                for (int i = 1; i < histoicFlowList.size(); i++) {
-                                                    name1 = histoicFlowList.get(i).getTaskName();
-                                                    Mobile = histoicFlowList.get(i).getFlag();
-                                                }
-                                                SmsModule.flowWork(companyId,Mobile, name1, name, tableComment1);
+
                                             }
                                         }
                                     }
@@ -261,17 +255,6 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                             List<OaPersonDefineTableColumn> columns = oaPersonDefineTableColumnDao.findList(param);
                                             StringBuilder theadHTML = new StringBuilder();
                                             StringBuilder tbodyHTML = new StringBuilder();
-
-                                            if(UserAgentUtils.isMobile(request)){
-                                                for (OaPersonDefineTableColumn column : columns) {
-                                                    tbodyHTML.append("<td>"+column.getColumnComment()+":"+"${item." + column.getColumnName() + "}</td><br/>");
-                                                }
-                                            }else {
-                                                for (OaPersonDefineTableColumn column : columns) {
-                                                    theadHTML.append("<th>" + column.getColumnComment() + "</th>");
-                                                    tbodyHTML.append("<td>${item." + column.getColumnName() + "}</td>");
-                                                }
-                                            }
 
 
                                             Map<String, String> paramMap = new HashMap<>();
