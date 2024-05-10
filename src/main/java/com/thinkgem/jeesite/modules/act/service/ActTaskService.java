@@ -256,24 +256,6 @@ public class ActTaskService extends BaseService {
             sql = "select * from JMY_ZCPD where proc_ins_id='" + procInsId + "'";
             list = oaPersonDefineTableDao.getFlowInfo(sql);
         }
-        String loginName = "";
-        if (list != null && list.size() > 0) {
-            Map<String, Object> map1 = list.get(0);
-            for (Map.Entry<String, Object> op : map1.entrySet()) {
-                if (op.getKey().equalsIgnoreCase("CCR") || op.getKey().equalsIgnoreCase("SQR")) {
-                    User user = new User();
-                    user.setName(op.getValue().toString());
-                    user.setCompanyId(UserUtils.getUser().getCompany().getId());
-                    User user1 = userDao.getByName(user);
-                    if (user1 != null) {
-                        loginName = user1.getLoginName();
-                    } else {
-                        loginName = op.getValue().toString();
-                    }
-                    break;
-                }
-            }
-        }
         return loginName;
     }
 
