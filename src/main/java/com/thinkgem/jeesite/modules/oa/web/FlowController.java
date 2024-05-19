@@ -667,26 +667,6 @@ public class FlowController extends BaseController {
         for (OaPersonDefineTableColumn column : oaPersonDefineTableColumns) {
             if (column != null && !"".equals(column)) {
                 String content = "";
-                if ("flowForm".equals(view) && !"REMARK".equalsIgnoreCase(column.getColumnType())) {
-                    Map<String, Object> columnMap = new HashMap<>();
-                    columnMap.put("value", column.getControlTypeId());
-                    columnMap.put("columnName", column.getColumnName());
-                    columnMap.put("params", column.getRemarks());
-                    if (ComponentUtils.chargeMoreData(column.getControlTypeId())) {
-                        columnMap.put("optData", DictUtils.getDictList(column.getRemarks()));
-                    }
-                    content = ComponentUtils.initComponent(columnMap, init);
-                    if ("text".equals(column.getControlTypeId()) || "number".equals(column.getControlTypeId()) || "textValue".equals(column.getControlTypeId())) {
-                        content = content.replace("<input ", "<input style='width:98%;padding-left:0;padding-right:0;margin:0;border:0;'");
-                    } else if ("textarea".equals(column.getControlTypeId())) {
-                        content = content.replace("<textarea ", "<textarea style='width:99%;height:99%;padding:0;margin:0;border:0;'");
-                    }
-                } else if ("REMARK".equalsIgnoreCase(column.getColumnType())) {
-                    content = "${" + column.getColumnName() + "}";
-
-                } else {
-                    content = "${" + column.getColumnName() + "}";
-                }
                 tableContent = tableContent.replace("[" + column.getColumnComment() + "]", content);
             }
         }

@@ -252,10 +252,6 @@ public class ActTaskService extends BaseService {
         String sql = "";
         sql = "select * from JMY_CLFBXD where proc_ins_id='" + procInsId + "'";
         list = oaPersonDefineTableDao.getFlowInfo(sql);
-        if (list == null || list.size() == 0) {
-            sql = "select * from JMY_ZCPD where proc_ins_id='" + procInsId + "'";
-            list = oaPersonDefineTableDao.getFlowInfo(sql);
-        }
         return loginName;
     }
 
@@ -340,13 +336,6 @@ public class ActTaskService extends BaseService {
                     sql.append(" and id='" + id + "' ");
                 }
                 for (OaPersonDefineTableColumn column : columns) {
-                    if (StringUtils.equalsIgnoreCase(column.getColumnComment(), "申请人") || StringUtils.equalsIgnoreCase(column.getColumnComment(), "出差人") || StringUtils.equalsIgnoreCase(column.getColumnComment(), "姓名")
-                            || StringUtils.equalsIgnoreCase(column.getColumnComment(), "被调薪人")) {
-                        if (StringUtils.isNotBlank(name)) {
-                            sql.append(" and " + column.getColumnName() + " like '%" + name + "%' ");
-                        }
-                    }
-
                     if (column.getColumnComment().indexOf("天数") != -1) {
                         if (StringUtils.isNotBlank(numberDay) && StringUtils.isNotBlank(fh)) {
                             if (StringUtils.equalsIgnoreCase(fh, "1")) {
