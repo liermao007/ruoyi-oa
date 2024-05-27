@@ -724,19 +724,6 @@ public class FlowController extends BaseController {
         if (StringUtils.isNotEmpty(category)) {
             cate = category;
         }
-        List<Object[]> processList = ProcessDefUtils.processList(cate);
-        //默认选择第一个流程
-        if (StringUtils.isBlank(procDefId)) {
-            ProcessDefinition process = (ProcessDefinition) processList.get(0)[0];
-            procDefId = process.getId();
-        }
-        //自定义流程HTML
-        StringBuilder selfFlowHTML = new StringBuilder();
-        for (Object[] objs : processList) {
-            ProcessDefinition process = (ProcessDefinition) objs[0];
-            selfFlowHTML.append("<option " + (procDefId.equals(process.getId()) ? "selected=\"selected\"" : "")
-                    + " value=\"" + process.getId() + "\">" + process.getName() + "</option>");
-        }
 
         String formKey = actTaskService.getFormKey(procDefId, null);
         if (StringUtils.isNotBlank(formKey) && !"/404".equals(formKey)) {
