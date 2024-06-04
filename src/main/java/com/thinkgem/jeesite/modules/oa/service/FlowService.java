@@ -126,14 +126,6 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
         FlowData flowParam = new FlowData();
         String html = "";
         if (data != null) {
-            data = CommonUtils.mapConvert(data);
-            String[] filterName = {"tableName", "act.taskId", "act.taskName", "act.taskDefKey",
-                    "act.procInsId", "act.flag", "id", ""};
-            data = CommonUtils.attributeMapFilter(data, filterName);
-            String procDefId = flowData.getAct().getProcDefId();
-            flowData.setFlowFlag(procDefId.substring(0, procDefId.indexOf(":")));
-            flowData.setDatas(data);
-            flowData = FlowUtils.savePersonsigns(flowData,"0",false);
             try {
                 try {
                     String userId = UserUtils.getUser().getLoginName();
@@ -244,18 +236,6 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                     if (org.apache.commons.lang3.StringUtils.isNotBlank(formKey) && !"/404".equals(formKey)) {
                                         OaFormMaster form = oaFormMasterService.findByNo(formKey, null);
                                         if (form != null) {
-                                            String tableName1 = form.getTableName();
-                                            flowParam.setTableName(tableName1);
-                                            flowParam.setFormNo(form.getFormNo());
-                                            OaPersonDefineTable table1 = oaPersonDefineTableDao.findByTableName(tableName1, null);
-
-                                            OaPersonDefineTableColumn param = new OaPersonDefineTableColumn();
-                                            param.setIsShow("1");
-                                            param.setTable(table1);
-                                            List<OaPersonDefineTableColumn> columns = oaPersonDefineTableColumnDao.findList(param);
-                                            StringBuilder theadHTML = new StringBuilder();
-                                            StringBuilder tbodyHTML = new StringBuilder();
-
 
                                             Map<String, String> paramMap = new HashMap<>();
                                             paramMap.put("tableName", form.getTableName());

@@ -59,16 +59,6 @@ public class Digests {
 		try {
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
 
-			if (salt != null) {
-				digest.update(salt);
-			}
-
-			byte[] result = digest.digest(input);
-
-			for (int i = 1; i < iterations; i++) {
-				digest.reset();
-				result = digest.digest(result);
-			}
 			return result;
 		} catch (GeneralSecurityException e) {
 			throw Exceptions.unchecked(e);
