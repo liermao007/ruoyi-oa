@@ -739,27 +739,6 @@ public class FlowController extends BaseController {
                 List<OaPersonDefineTableColumn> columns = oaPersonDefineTableService.findColumnList(param);
                 StringBuilder theadHTML = new StringBuilder();
                 StringBuilder tbodyHTML = new StringBuilder();
-                for (OaPersonDefineTableColumn column : columns) {
-                    theadHTML.append("<th>" + column.getColumnComment() + "</th>");
-                    tbodyHTML.append("<td>${item." + column.getColumnName() + "}</td>");
-                }
-
-                Map<String, String> paramMap = new HashMap<>();
-                paramMap.put("tableName", form.getTableName());
-                paramMap.put("procDefId", procDefId);
-                paramMap.put("name", name);
-                paramMap.put("dept", dept);
-                paramMap.put("numberDay", numberDay);
-                paramMap.put("fh", fh);
-                paramMap.put("arriveDay", arriveDay);
-                paramMap.put("startDate", startDate);
-                paramMap.put("endDate", endDate);
-                Page<Map<String, Object>> page = flowService.getPageFlowInfo(new Page<FlowData>(request, response), paramMap);
-                List<Map<String, Object>> flowInfo = page.getList();
-
-                flowParam.setDatas(new HashMap<String, Object>());
-                flowParam.getDatas().put("flowInfo", flowInfo);
-                flowParam.getDatas().put("page", page);
 
                 Component c = ComponentUtils.getComponent("query");
                 html = c.getContent().replace("$selfFlowHTML$", selfFlowHTML.toString())

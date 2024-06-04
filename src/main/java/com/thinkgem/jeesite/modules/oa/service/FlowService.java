@@ -244,18 +244,6 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                     if (org.apache.commons.lang3.StringUtils.isNotBlank(formKey) && !"/404".equals(formKey)) {
                                         OaFormMaster form = oaFormMasterService.findByNo(formKey, null);
                                         if (form != null) {
-                                            String tableName1 = form.getTableName();
-                                            flowParam.setTableName(tableName1);
-                                            flowParam.setFormNo(form.getFormNo());
-                                            OaPersonDefineTable table1 = oaPersonDefineTableDao.findByTableName(tableName1, null);
-
-                                            OaPersonDefineTableColumn param = new OaPersonDefineTableColumn();
-                                            param.setIsShow("1");
-                                            param.setTable(table1);
-                                            List<OaPersonDefineTableColumn> columns = oaPersonDefineTableColumnDao.findList(param);
-                                            StringBuilder theadHTML = new StringBuilder();
-                                            StringBuilder tbodyHTML = new StringBuilder();
-
 
                                             Map<String, String> paramMap = new HashMap<>();
                                             paramMap.put("tableName", form.getTableName());
