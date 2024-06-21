@@ -27,26 +27,4 @@ public class TplUtils {
         }
         return result;
     }
-
-    /**
-     * 检查tpl是否存在于excludes里面。
-     *
-     * @param excludes
-     * @param tpl
-     * @return
-     */
-    private static boolean tplContain(String[] excludes, String tpl) {
-        int start = tpl.lastIndexOf("/");
-        int end = tpl.lastIndexOf(".");
-        if (start == -1 || end == -1) {
-            throw new RuntimeException("tpl not contain '/' or '.':" + tpl);
-        }
-        String name = tpl.substring(start + 1, end);
-        for (String e : excludes) {
-            if (e.equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

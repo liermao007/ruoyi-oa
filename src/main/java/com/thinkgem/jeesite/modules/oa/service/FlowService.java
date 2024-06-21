@@ -155,17 +155,6 @@ public class FlowService extends CrudService<FlowDao, FlowData> {
                                     tasks.remove(i) ;
                                 }
                             }
-                            String assigneeName = tasks.get(0).getAssignee();   //下一步审批人的登录名
-                            User user = new User();
-                            if (org.apache.commons.lang3.StringUtils.isNotEmpty(assigneeName)) {
-                                user = systemService.getUserByLoginName(assigneeName);
-                            }
-                            String tableName = flowData.getTableName();
-                            OaPersonDefineTable table = oaPersonDefineTableDao.findByTableName(tableName, null);
-                            String tableComment = table.getTableComment();
-                            if ("预借款申请单".equals(tableComment)) {
-                                tableComment = "预借款" + " " + "申请单";
-                            }
                             ProcessDefinitionEntity def = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(tasks.get(0).getProcessDefinitionId());
                             List<ActivityImpl> activitiList = def.getActivities(); //rs是指RepositoryService的实例
                             String excId = tasks.get(0).getExecutionId();
