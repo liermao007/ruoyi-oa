@@ -81,43 +81,6 @@ public class HttpClientUtils   {
         return doGet(url, null);
     }
 
-    public static String doPost(String url, Map<String, String> param) {
-        // 创建Httpclient对象
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        String resultString = "";
-        try {
-            // 创建Http Post请求
-            HttpPost httpPost = new HttpPost(url);
-            // 创建参数列表
-            if (param != null) {
-                List<NameValuePair> paramList = new ArrayList<NameValuePair>();
-                for (String key : param.keySet()) {
-                    paramList.add(new BasicNameValuePair(key, param.get(key)));
-                }
-                paramList.add(new BasicNameValuePair("api_id", "881cb8558ed741dfa666c95595bcec7f"));
-                paramList.add(new BasicNameValuePair("api_secret", "5fd76ab4b53144719d82afae166dbd24"));
-                // 模拟表单
-                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList);
-                httpPost.setEntity(entity);
-            }
-            // 执行http请求
-            response = httpClient.execute(httpPost);
-            resultString = EntityUtils.toString(response.getEntity(), "utf-8");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                response.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        return resultString;
-    }
-
     public static String doPost(String url) {
         return doPost(url, null);
     }
