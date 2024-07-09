@@ -44,21 +44,6 @@ public class CmsUtils {
 	private static final String CMS_CACHE = "cmsCache";
 	
 	/**
-	 * 获得站点列表
-	 */
-	public static List<Site> getSiteList(){
-		@SuppressWarnings("unchecked")
-		List<Site> siteList = (List<Site>)CacheUtils.get(CMS_CACHE, "siteList");
-		if (siteList == null){
-			Page<Site> page = new Page<Site>(1, -1);
-			page = siteService.findPage(page, new Site());
-			siteList = page.getList();
-			CacheUtils.put(CMS_CACHE, "siteList", siteList);
-		}
-		return siteList;
-	}
-	
-	/**
 	 * 获得站点信息
 	 * @param siteId 站点编号
 	 */
