@@ -83,11 +83,6 @@ public class OaFormMasterService extends CrudService<OaFormMasterDao, OaFormMast
             resultString += office.getId()+",";
         }
         String companyIds="";
-        if(resultString.length()>0){
-             companyIds=  resultString.substring(0,resultString.length() - 1);
-        }else {
-            companyIds="";
-        }
 
         List<OaFormMaster> oaFormMasterList=  oaFormMasterDao.findListByCompanyIds(companyIds);
 

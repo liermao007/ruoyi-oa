@@ -42,8 +42,7 @@ public class BeanMapper {
 	public static <T> List<T> mapList(Collection sourceList, Class<T> destinationClass) {
 		List<T> destinationList = Lists.newArrayList();
 		for (Object sourceObject : sourceList) {
-			T destinationObject = dozer.map(sourceObject, destinationClass);
-			destinationList.add(destinationObject);
+
 		}
 		return destinationList;
 	}
