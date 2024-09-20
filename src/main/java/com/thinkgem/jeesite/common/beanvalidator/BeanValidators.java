@@ -67,40 +67,6 @@ public class BeanValidators {
 	}
 
 	/**
-	 * 辅助方法, 转换Set<ConstraintViolation>为Map<property, message>.
-	 */
-	@SuppressWarnings("rawtypes")
-	public static Map<String, String> extractPropertyAndMessage(Set<? extends ConstraintViolation> constraintViolations) {
-		Map<String, String> errorMessages = Maps.newHashMap();
-		for (ConstraintViolation violation : constraintViolations) {
-			errorMessages.put(violation.getPropertyPath().toString(), violation.getMessage());
-		}
-		return errorMessages;
-	}
-
-	/**
-	 * 辅助方法, 转换ConstraintViolationException中的Set<ConstraintViolations>为List<propertyPath message>.
-	 */
-	public static List<String> extractPropertyAndMessageAsList(ConstraintViolationException e) {
-		return extractPropertyAndMessageAsList(e.getConstraintViolations(), " ");
-	}
-
-	/**
-	 * 辅助方法, 转换Set<ConstraintViolations>为List<propertyPath message>.
-	 */
-	@SuppressWarnings("rawtypes")
-	public static List<String> extractPropertyAndMessageAsList(Set<? extends ConstraintViolation> constraintViolations) {
-		return extractPropertyAndMessageAsList(constraintViolations, " ");
-	}
-
-	/**
-	 * 辅助方法, 转换ConstraintViolationException中的Set<ConstraintViolations>为List<propertyPath +separator+ message>.
-	 */
-	public static List<String> extractPropertyAndMessageAsList(ConstraintViolationException e, String separator) {
-		return extractPropertyAndMessageAsList(e.getConstraintViolations(), separator);
-	}
-
-	/**
 	 * 辅助方法, 转换Set<ConstraintViolation>为List<propertyPath +separator+ message>.
 	 */
 	@SuppressWarnings("rawtypes")
